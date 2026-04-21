@@ -46,20 +46,20 @@ export type Listbox = {
 
 export type Elements = {
 	AddToggle: (self,Config: Toggle) -> {
-		Option: Elements	
+		Option: Elements
 	},
 	AddSlider: (self,Config: Slider) -> {
-		Option: Elements	
+		Option: Elements
 	},
 	AddButton: (self,Config: Button) -> {},
 	AddColorPicker: (self,Config: ColorPicker) -> {
-		Option: Elements	
+		Option: Elements
 	},
 	AddDropdown: (self,Config: Dropdown) -> {
-		Option: Elements	
+		Option: Elements
 	},
 	AddKeybind: (self,Config: Keybind) -> {
-		Option: Elements	
+		Option: Elements
 	},
 }
 
@@ -1126,11 +1126,11 @@ Fatality.Lucide = {
 Fatality.WindowFlags = {};
 
 function Fatality:IsMobile() : boolean
-	return UserInputService.TouchEnabled;	
+	return UserInputService.TouchEnabled;
 end;
 
 function Fatality:RandomString() : string
-	return string.char(math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102));	
+	return string.char(math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102),math.random(64,102));
 end;
 
 function Fatality:GetTextSize(Text : TextLabel,CustomFont: Enum.Font) : Vector2
@@ -1226,7 +1226,7 @@ function Fatality:Drag(InputFrame: Frame, MoveFrame: Frame, Speed : number)
 	end;
 
 	InputFrame.InputBegan:Connect(function(input)
-		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and #Fatality.DragBlacklist <= 0 then 
+		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and #Fatality.DragBlacklist <= 0 then
 			dragToggle = true
 			dragStart = input.Position
 			startPos = MoveFrame.Position
@@ -1285,6 +1285,307 @@ function Fatality:GetWindowFromElement(Element: GuiObject)
 			return v;
 		end;
 	end;
+end;
+
+function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame)
+	local OwnWindow = Fatality:GetWindowFromElement(ParentToggle);
+	if not OwnWindow then
+		return { Open = function() end, Close = function() end, Toggle = function() end };
+	end;
+
+	local KeyNames = {
+		One = '1', Two = '2', Three = '3', Four = '4', Five = '5',
+		Six = '6', Seven = '7', Eight = '8', Nine = '9', Zero = '0',
+		['Minus'] = "-", ['Plus'] = "+", BackSlash = "\\", Slash = "/",
+		Period = '.', Semicolon = ';', Colon = ":", LeftControl = "LCtrl",
+		RightControl = "RCtrl", LeftShift = "LShift", RightShift = "RShift",
+		Return = "Enter", LeftBracket = "[", RightBracket = "]", Quote = "'",
+		Comma = ",", Equals = "=", LeftSuper = "Super", RightSuper = "Super",
+	};
+
+	local GetKeyName = function(item)
+		if item then
+			if typeof(item) == 'EnumItem' then
+				return KeyNames[item.Name] or item.Name;
+			else
+				return KeyNames[tostring(item)] or tostring(item);
+			end;
+		else
+			return 'None';
+		end;
+	end;
+
+	local CurrentKey  = nil;
+	local Modes       = {"Toggle", "Hold", "Always"};
+	local ModeIndex   = 1;
+	local IsBinding   = false;
+	local IsOpen      = false;
+	local SPAWN_THREAD = nil;
+
+	-- ── UI instances ──────────────────────────────────────────────
+	local PopupFrame      = Instance.new("Frame");
+	local PopupUICorner   = Instance.new("UICorner");
+	local PopupUIStroke   = Instance.new("UIStroke");
+	local PopupShadow     = Instance.new("ImageLabel");
+
+	local AddHotkeyBtn    = Instance.new("TextButton");
+	local Divider         = Instance.new("Frame");
+	local BottomRow       = Instance.new("Frame");
+
+	local ModeBtn         = Instance.new("TextButton");
+	local ModeBtnCorner   = Instance.new("UICorner");
+
+	local GearIcon        = Instance.new("ImageLabel");
+
+	local KeyFrame        = Instance.new("Frame");
+	local KeyFrameCorner  = Instance.new("UICorner");
+	local KeyText         = Instance.new("TextLabel");
+	local KeyClickBtn     = Instance.new("TextButton");
+
+	-- ── PopupFrame ────────────────────────────────────────────────
+	PopupFrame.Active               = true;
+	PopupFrame.Name                 = Fatality:RandomString();
+	PopupFrame.Parent               = OwnWindow;
+	PopupFrame.AnchorPoint          = Vector2.new(0.5, 0);
+	PopupFrame.BackgroundColor3     = Color3.fromRGB(24, 24, 24);
+	PopupFrame.BorderSizePixel      = 0;
+	PopupFrame.ClipsDescendants     = true;
+	PopupFrame.Position             = UDim2.new(4, 0, 4, 0);
+	PopupFrame.Size                 = UDim2.new(0, 165, 0, 0);
+	PopupFrame.ZIndex               = 150;
+	Fatality:AddDragBlacklist(PopupFrame);
+
+	PopupUICorner.CornerRadius      = UDim.new(0, 3);
+	PopupUICorner.Parent            = PopupFrame;
+
+	PopupUIStroke.Color             = Color3.fromRGB(40, 40, 40);
+	PopupUIStroke.Transparency      = 1;
+	PopupUIStroke.Parent            = PopupFrame;
+
+	PopupShadow.Name                = Fatality:RandomString();
+	PopupShadow.Parent              = PopupFrame;
+	PopupShadow.AnchorPoint         = Vector2.new(0.5, 0.5);
+	PopupShadow.BackgroundTransparency = 1;
+	PopupShadow.BorderSizePixel     = 0;
+	PopupShadow.Position            = UDim2.new(0.5, 0, 0.5, 0);
+	PopupShadow.Rotation            = 0.001;
+	PopupShadow.Size                = UDim2.new(1, 47, 1, 47);
+	PopupShadow.ZIndex              = 149;
+	PopupShadow.Image               = "rbxassetid://6014261993";
+	PopupShadow.ImageColor3         = Color3.fromRGB(0, 0, 0);
+	PopupShadow.ImageTransparency   = 1;
+	PopupShadow.ScaleType           = Enum.ScaleType.Slice;
+	PopupShadow.SliceCenter         = Rect.new(49, 49, 450, 450);
+
+	-- ── "Add hotkey" button (top row) ─────────────────────────────
+	AddHotkeyBtn.Name               = Fatality:RandomString();
+	AddHotkeyBtn.Parent             = PopupFrame;
+	AddHotkeyBtn.BackgroundTransparency = 1;
+	AddHotkeyBtn.BorderSizePixel    = 0;
+	AddHotkeyBtn.Position           = UDim2.new(0, 0, 0, 0);
+	AddHotkeyBtn.Size               = UDim2.new(1, 0, 0, 26);
+	AddHotkeyBtn.ZIndex             = 151;
+	AddHotkeyBtn.FontFace           = Fatality.FontSemiBold;
+	AddHotkeyBtn.Text               = "Add hotkey";
+	AddHotkeyBtn.TextColor3         = Color3.fromRGB(255, 255, 255);
+	AddHotkeyBtn.TextSize           = 12;
+	AddHotkeyBtn.TextTransparency   = 0.30;
+
+	-- ── thin divider ──────────────────────────────────────────────
+	Divider.Name                    = Fatality:RandomString();
+	Divider.Parent                  = PopupFrame;
+	Divider.BackgroundColor3        = Color3.fromRGB(40, 40, 40);
+	Divider.BorderSizePixel         = 0;
+	Divider.Position                = UDim2.new(0, 7, 0, 26);
+	Divider.Size                    = UDim2.new(1, -14, 0, 1);
+	Divider.ZIndex                  = 151;
+
+	-- ── bottom row container ──────────────────────────────────────
+	BottomRow.Name                  = Fatality:RandomString();
+	BottomRow.Parent                = PopupFrame;
+	BottomRow.BackgroundTransparency = 1;
+	BottomRow.BorderSizePixel       = 0;
+	BottomRow.Position              = UDim2.new(0, 7, 0, 30);
+	BottomRow.Size                  = UDim2.new(1, -14, 0, 20);
+	BottomRow.ZIndex                = 151;
+
+	-- ── mode toggle button ────────────────────────────────────────
+	ModeBtn.Name                    = Fatality:RandomString();
+	ModeBtn.Parent                  = BottomRow;
+	ModeBtn.BackgroundColor3        = Color3.fromRGB(16, 16, 16);
+	ModeBtn.BorderSizePixel         = 0;
+	ModeBtn.Position                = UDim2.new(0, 0, 0, 0);
+	ModeBtn.Size                    = UDim2.new(0, 72, 1, 0);
+	ModeBtn.ZIndex                  = 152;
+	ModeBtn.FontFace                = Fatality.FontSemiBold;
+	ModeBtn.Text                    = "Toggle  ▾";
+	ModeBtn.TextColor3              = Color3.fromRGB(255, 255, 255);
+	ModeBtn.TextSize                = 10;
+	ModeBtn.TextTransparency        = 0.30;
+
+	ModeBtnCorner.CornerRadius      = UDim.new(0, 2);
+	ModeBtnCorner.Parent            = ModeBtn;
+
+	-- ── gear icon ─────────────────────────────────────────────────
+	GearIcon.Name                   = Fatality:RandomString();
+	GearIcon.Parent                 = BottomRow;
+	GearIcon.BackgroundTransparency = 1;
+	GearIcon.BorderSizePixel        = 0;
+	GearIcon.AnchorPoint            = Vector2.new(0, 0.5);
+	GearIcon.Position               = UDim2.new(0, 78, 0.5, 0);
+	GearIcon.Size                   = UDim2.new(0, 13, 0, 13);
+	GearIcon.ZIndex                 = 152;
+	GearIcon.Image                  = "http://www.roblox.com/asset/?id=14007344336";
+	GearIcon.ImageTransparency      = 0.50;
+
+	-- ── key display frame ─────────────────────────────────────────
+	KeyFrame.Name                   = Fatality:RandomString();
+	KeyFrame.Parent                 = BottomRow;
+	KeyFrame.AnchorPoint            = Vector2.new(1, 0);
+	KeyFrame.BackgroundColor3       = Color3.fromRGB(16, 16, 16);
+	KeyFrame.BorderSizePixel        = 0;
+	KeyFrame.Position               = UDim2.new(1, 0, 0, 0);
+	KeyFrame.Size                   = UDim2.new(0, 32, 1, 0);
+	KeyFrame.ZIndex                 = 152;
+
+	KeyFrameCorner.CornerRadius     = UDim.new(0, 2);
+	KeyFrameCorner.Parent           = KeyFrame;
+
+	KeyText.Name                    = Fatality:RandomString();
+	KeyText.Parent                  = KeyFrame;
+	KeyText.BackgroundTransparency  = 1;
+	KeyText.BorderSizePixel         = 0;
+	KeyText.Size                    = UDim2.new(1, 0, 1, 0);
+	KeyText.ZIndex                  = 153;
+	KeyText.FontFace                = Fatality.FontSemiBold;
+	KeyText.Text                    = "None";
+	KeyText.TextColor3              = Color3.fromRGB(255, 255, 255);
+	KeyText.TextSize                = 10;
+	KeyText.TextTransparency        = 0.30;
+
+	KeyClickBtn.Name                = Fatality:RandomString();
+	KeyClickBtn.Parent              = KeyFrame;
+	KeyClickBtn.BackgroundTransparency = 1;
+	KeyClickBtn.BorderSizePixel     = 0;
+	KeyClickBtn.Size                = UDim2.new(1, 0, 1, 0);
+	KeyClickBtn.ZIndex              = 154;
+	KeyClickBtn.Text                = "";
+
+	-- ── open / close animation ────────────────────────────────────
+	local TogglePopup = function(bool)
+		if bool then
+			IsOpen = true;
+
+			local px = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X / 2;
+			local py = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 4;
+			PopupFrame.Position = UDim2.fromOffset(px, py);
+
+			Fatality:CreateAnimation(PopupFrame, 0.45, {
+				Size = UDim2.new(0, 165, 0, 54);
+			});
+			Fatality:CreateAnimation(PopupUIStroke, 0.45, {
+				Transparency = 0;
+			});
+			Fatality:CreateAnimation(PopupShadow, 0.45, {
+				ImageTransparency = 0.75;
+			});
+
+			if SPAWN_THREAD then task.cancel(SPAWN_THREAD); SPAWN_THREAD = nil; end;
+			SPAWN_THREAD = task.spawn(function()
+				while true do task.wait(0.1);
+					local npx = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X / 2;
+					local npy = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 4;
+					Fatality:CreateAnimation(PopupFrame, 0.35, {
+						Position = UDim2.fromOffset(npx, npy);
+					});
+				end;
+			end);
+		else
+			IsOpen = false;
+			if SPAWN_THREAD then task.cancel(SPAWN_THREAD); SPAWN_THREAD = nil; end;
+
+			Fatality:CreateAnimation(PopupFrame, 0.45, {
+				Size = UDim2.new(0, 165, 0, 0);
+			});
+			Fatality:CreateAnimation(PopupUIStroke, 0.45, {
+				Transparency = 1;
+			});
+			Fatality:CreateAnimation(PopupShadow, 0.45, {
+				ImageTransparency = 1;
+			});
+		end;
+	end;
+
+	TogglePopup(false);
+
+	-- ── start-binding logic ───────────────────────────────────────
+	local startBinding = function()
+		if IsBinding then return end;
+		IsBinding = true;
+		KeyText.Text        = "...";
+		AddHotkeyBtn.Text   = "Press a key...";
+
+		local Selected = nil;
+		while not Selected do
+			local Key = UserInputService.InputBegan:Wait();
+			if Key.KeyCode ~= Enum.KeyCode.Unknown then
+				Selected = Key.KeyCode;
+			elseif Key.UserInputType == Enum.UserInputType.MouseButton1 then
+				-- left-click cancels; keep previous key
+				Selected = CurrentKey;
+				break;
+			end;
+		end;
+
+		CurrentKey          = Selected;
+		KeyText.Text        = GetKeyName(Selected);
+		AddHotkeyBtn.Text   = "Add hotkey";
+		IsBinding           = false;
+	end;
+
+	AddHotkeyBtn.MouseButton1Click:Connect(startBinding);
+	KeyClickBtn.MouseButton1Click:Connect(startBinding);
+
+	-- ── mode cycle ────────────────────────────────────────────────
+	ModeBtn.MouseButton1Click:Connect(function()
+		ModeIndex   = (ModeIndex % #Modes) + 1;
+		ModeBtn.Text = Modes[ModeIndex] .. "  ▾";
+	end);
+
+	-- ── hover effects ─────────────────────────────────────────────
+	Fatality:CreateHover(AddHotkeyBtn, function(b)
+		Fatality:CreateAnimation(AddHotkeyBtn, 0.25, {
+			TextTransparency = b and 0 or 0.30;
+		});
+	end);
+	Fatality:CreateHover(ModeBtn, function(b)
+		Fatality:CreateAnimation(ModeBtn, 0.25, {
+			BackgroundColor3 = b and Color3.fromRGB(26, 26, 26) or Color3.fromRGB(16, 16, 16);
+		});
+	end);
+	Fatality:CreateHover(KeyFrame, function(b)
+		Fatality:CreateAnimation(KeyFrame, 0.25, {
+			BackgroundColor3 = b and Color3.fromRGB(26, 26, 26) or Color3.fromRGB(16, 16, 16);
+		});
+	end);
+
+	-- ── close on outside click ────────────────────────────────────
+	UserInputService.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+			or input.UserInputType == Enum.UserInputType.Touch then
+			if IsOpen and not Fatality:IsMouseOverFrame(PopupFrame) then
+				TogglePopup(false);
+			end;
+		end;
+	end);
+
+	return {
+		Open   = function() TogglePopup(true)  end;
+		Close  = function() TogglePopup(false) end;
+		Toggle = function() TogglePopup(not IsOpen) end;
+		GetKey  = function() return CurrentKey end;
+		GetMode = function() return Modes[ModeIndex] end;
+	};
 end;
 
 function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): Elements
@@ -1442,6 +1743,10 @@ function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): E
 
 	if ParentFrame then
 		local function bindRCC(obj)
+			-- Skip frames/children marked as hotkey zones (right-click is handled by keybind popup there)
+			if obj:GetAttribute("_hotkey_zone") then return end;
+			local par = obj.Parent;
+			if par and par ~= ParentFrame and par:GetAttribute("_hotkey_zone") then return end;
 			obj.InputBegan:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton2 then
 					ToggleExt(true);
@@ -1900,7 +2205,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 				ImageTransparency = 0.45
 			})
 		end
-	end)	
+	end)
 
 	Fatality:CreateHover(PasteButton,function(bool)
 		if bool then
@@ -2437,6 +2742,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.SizeConstraint = Enum.SizeConstraint.RelativeYY
 		ValueFrame.ZIndex = ZIndex + 2
 		ValueFrame.BackgroundTransparency = 1;
+		ValueFrame:SetAttribute("_hotkey_zone", true);
 
 		UICorner.CornerRadius = UDim.new(0, 2)
 		UICorner.Parent = ValueFrame
@@ -2553,10 +2859,18 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 			end;
 		end)
 
-		Fatality:NewInput(ValueFrame,function()
+		local ToggleInputBtn = Fatality:NewInput(ValueFrame,function()
 			Config.Default = not Config.Default;
 			toggleImg(Config.Default);
 			Config.Callback(Config.Default)
+		end);
+
+		-- right-click the checkbox → open keybind popup
+		local HotkeyPopup = Fatality:CreateKeybindPopup(ValueFrame, Toggle);
+		ToggleInputBtn.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton2 then
+				HotkeyPopup.Toggle();
+			end;
 		end);
 
 		local Respons = Fatality:CreateResponse({
@@ -3050,7 +3364,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 			SetValue = function(rgb,opc)
 				local IsSame = ValueFrame.BackgroundColor3 == rgb or ValueFrame.BackgroundTransparency == opc;
 
-				ValueFrame.BackgroundColor3 = rgb; 
+				ValueFrame.BackgroundColor3 = rgb;
 				ValueFrame.BackgroundTransparency = opc;
 				res.set_opc(opc);
 
@@ -3104,7 +3418,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 					for i,v in next , value do
 						if v == true then
 							table.insert(x , tostring(i));
-						end			
+						end
 					end;
 
 					Out = table.concat(x,' , ');
@@ -3327,7 +3641,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 
 		return Respons;
 	end;
-	
+
 	function elements:AddKeybind(Config: Keybind)
 		Config = Config or {};
 		Config.Name = Config.Name or "Keybind";
@@ -4039,7 +4353,7 @@ function Fatality:CreateConfigWindow(Root: ScreenGui , Fatal , Button: ImageButt
 
 		SaveConfig = function(name,content)
 			if string.find(name,'/',1,true) or string.find(name,'\\',1,true) or string.find(name,':',1,true) then
-				return;	
+				return;
 			end;
 
 			assert(res.ConfigDirectory , "Config directory not found");
@@ -4071,11 +4385,11 @@ function Fatality:CreateConfigWindow(Root: ScreenGui , Fatal , Button: ImageButt
 
 		Init = function(Name: string,Folder: string)
 			if not isfolder(Folder or "Fatality") then
-				makefolder(Folder or "Fatality");	
+				makefolder(Folder or "Fatality");
 			end;
 
 			if not isfolder((Folder or "Fatality").."/Config") then
-				makefolder((Folder or "Fatality").."/Config");	
+				makefolder((Folder or "Fatality").."/Config");
 			end;
 
 			local cfgPath = (Folder or "Fatality").."/Config/"..tostring(Name);
@@ -4432,7 +4746,7 @@ function Fatality.new(Window: Window)
 
 	UICorner.CornerRadius = UDim.new(0, 5)
 	UICorner.Parent = FatalFrame
-	
+
 	local FatalFrameUIScale = Instance.new("UIScale")
 	FatalFrameUIScale.Parent = FatalFrame
 	FatalFrameUIScale.Scale = 1
@@ -5123,13 +5437,13 @@ function Fatality.new(Window: Window)
 				end;
 			end;
 		end);
-		
+
 		function MenuLib:AddPreview(Config: Preview)
 			Config = Config or {};
 			Config.Name = Config.Name or "PREVIEW";
 			Config.Position = Config.Position or "left";
 			Config.Height = Config.Height or 0;
-			
+
 			local Preview = Instance.new("Frame")
 			local PreviewName = Instance.new("TextLabel")
 			local Main = Instance.new("Frame")
@@ -5145,7 +5459,7 @@ function Fatality.new(Window: Window)
 			Preview.ClipsDescendants = true
 			Preview.ZIndex = 15;
 			Preview.Size = UDim2.new(1, 0, 0, 25 + Config.Height)
-	
+
 			PreviewName.Name = "PreviewName"
 			PreviewName.Parent = Preview
 			PreviewName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -5188,7 +5502,7 @@ function Fatality.new(Window: Window)
 			MainBlock.Position = UDim2.new(0.5, 0, 0.5, 0)
 			MainBlock.Size = UDim2.new(1, -5, 1, -5)
 			MainBlock.ZIndex = 18
-			
+
 			local Toggle = function(v)
 				if v then
 					Fatality:CreateAnimation(Preview,0.5,{
@@ -5199,15 +5513,15 @@ function Fatality.new(Window: Window)
 						TextStrokeTransparency = 0.750,
 						TextTransparency = 0
 					})
-					
+
 					Fatality:CreateAnimation(Main,0.5,{
 						BackgroundTransparency = 0
 					})
-					
+
 					Fatality:CreateAnimation(UIStroke,0.5,{
 						Transparency = 0
 					})
-					
+
 					Fatality:CreateAnimation(MainBlock,0.5,{
 						Size = UDim2.new(1, -5, 1, -5)
 					})
@@ -5238,7 +5552,7 @@ function Fatality.new(Window: Window)
 			Toggle(BindEvent:GetAttribute('V'));
 
 			BindEvent.Event:Connect(Toggle);
-			
+
 			return MainBlock;
 		end;
 
@@ -5878,7 +6192,7 @@ function Fatality.new(Window: Window)
 				Fatality:CreateAnimation(SaveButton,0.5,{
 					ImageTransparency = 0.5
 				})
-			end	
+			end
 		end);
 
 		Fatality:CreateHover(InfoButton,function(bool)
@@ -5890,7 +6204,7 @@ function Fatality.new(Window: Window)
 				Fatality:CreateAnimation(InfoButton,0.5,{
 					ImageTransparency = 0.5
 				})
-			end	
+			end
 		end);
 
 		function Fatal:AddSave(callback)
@@ -6088,7 +6402,7 @@ function Fatality.new(Window: Window)
 				Fatality:CreateAnimation(SearchButton,0.5,{
 					ImageTransparency = 0.5
 				})
-			end	
+			end
 		end);
 
 		local SearchInformation = {};
@@ -6153,7 +6467,7 @@ function Fatality.new(Window: Window)
 					Fatality:CreateAnimation(ResultFrame,0.5,{
 						BackgroundTransparency = 1
 					})
-				end	
+				end
 			end);
 
 			button.MouseButton1Click:Connect(function()
