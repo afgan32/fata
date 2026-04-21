@@ -5432,8 +5432,8 @@ function Fatality.new(Window: Window)
 
 	MenuFrame.Name = Fatality:RandomString()
 	MenuFrame.Parent = FatalFrame
-	MenuFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	MenuFrame.BackgroundTransparency = 1.000
+	MenuFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+	MenuFrame.BackgroundTransparency = 0
 	MenuFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	MenuFrame.BorderSizePixel = 0
 	MenuFrame.Position = UDim2.new(0, 0, 0, 50)
@@ -5663,14 +5663,13 @@ function Fatality.new(Window: Window)
 		local MenuLib = {};
 		local MenuButton = Instance.new("Frame")
 		local UICorner = Instance.new("UICorner")
-		local UIStroke = Instance.new("UIStroke")
 		local Icon = Instance.new("ImageLabel")
 		local UICorner_2 = Instance.new("UICorner")
 		local menu_name = Instance.new("TextLabel")
 
 		MenuButton.Name = Fatality:RandomString()
 		MenuButton.Parent = tbc;
-		MenuButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+		MenuButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 		MenuButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		MenuButton.BorderSizePixel = 0
 		MenuButton.Size = UDim2.new(0, 90, 0.85, 0)
@@ -5678,9 +5677,6 @@ function Fatality.new(Window: Window)
 
 		UICorner.CornerRadius = UDim.new(0, 3)
 		UICorner.Parent = MenuButton
-
-		UIStroke.Transparency = 0.950
-		UIStroke.Parent = MenuButton
 
 		Icon.Name = Fatality:RandomString()
 		Icon.Parent = MenuButton
@@ -5816,10 +5812,6 @@ function Fatality.new(Window: Window)
 			if Bool then
 				Fatality:CreateAnimation(MenuButton,0.5,{
 					BackgroundTransparency = (MenuLiber.Visible and 0) or 1
-				})
-
-				Fatality:CreateAnimation(UIStroke,0.5,{
-					Transparency = 0.950
 				})
 
 				Fatality:CreateAnimation(Left,0.3,{
