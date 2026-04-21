@@ -1054,7 +1054,7 @@ Fatality.Lucide = {
 	["lucide-siren"] = "rbxassetid://10734961284",
 	["lucide-skip-back"] = "rbxassetid://10734961526",
 	["lucide-skip-forward"] = "rbxassetid://10734961809",
-	["lucide-skull"] = "rbxassetid://105823121760863",
+	["lucide-skull"] = "rbxassetid://10734962068",
 	["lucide-slack"] = "rbxassetid://10734962339",
 	["lucide-slash"] = "rbxassetid://10734962600",
 	["lucide-slice"] = "rbxassetid://10734963024",
@@ -2882,7 +2882,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 				while true do task.wait()
 					local baseSize = UIListLayout.AbsoluteContentSize.Y + 10;
 
-					DropdownItemFrame.Position = UDim2.fromOffset(Parent.AbsolutePosition.X,Parent.AbsolutePosition.Y + (Parent.AbsoluteSize.Y * 5))
+					DropdownItemFrame.Position = UDim2.fromOffset(Parent.AbsolutePosition.X,Parent.AbsolutePosition.Y + Parent.AbsoluteSize.Y)
 
 					Fatality:CreateAnimation(DropdownItemFrame,0.35,{
 						Size = UDim2.new(0, 175, 0, math.clamp(baseSize,0,200))
@@ -2922,7 +2922,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 	DropdownItemFrame.Name = Fatality:RandomString()
 	DropdownItemFrame.Parent = Window
 	DropdownItemFrame.AnchorPoint = Vector2.new(0, 0)
-	DropdownItemFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+	DropdownItemFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 	DropdownItemFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	DropdownItemFrame.BorderSizePixel = 0
 	DropdownItemFrame.ClipsDescendants = true
@@ -3673,7 +3673,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 
 		Button.Name = Fatality:RandomString()
 		Button.Parent = Parent
-		Button.BackgroundColor3 = Fatality.Colors.Black
+		Button.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 		Button.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Button.BorderSizePixel = 0
 		Button.Size = UDim2.new(1, -25, 0, 25)
@@ -3725,11 +3725,11 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Fatality:CreateHover(Button,function(value)
 			if value then
 				Fatality:CreateAnimation(Button,0.45,{
-					BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+					BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 				})
 			else
 				Fatality:CreateAnimation(Button,0.45,{
-					BackgroundColor3 = Fatality.Colors.Black
+					BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 				})
 			end;
 		end)
@@ -4243,7 +4243,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.Name = Fatality:RandomString()
 		ValueFrame.Parent = Keybind
 		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
-		ValueFrame.BackgroundColor3 = Fatality.Colors.Black
+		ValueFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
