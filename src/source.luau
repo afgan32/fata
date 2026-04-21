@@ -301,6 +301,45 @@ Fatality.Colors = {
 	Main = Color3.fromRGB(250, 36, 73)
 };
 Fatality.DragBlacklist = {};
+-- global element registries for resize control
+Fatality.SliderValueFrames    = {};
+Fatality.DropdownValueFrames  = {};
+Fatality.GlobalSliderWidth    = 85;
+Fatality.GlobalDropdownWidth  = 75;
+
+function Fatality:SetGlobalSliderWidth(w)
+	Fatality.GlobalSliderWidth = w;
+	for _, f in ipairs(Fatality.SliderValueFrames) do
+		if typeof(f) == "Instance" and f.Parent then
+			f.Size = UDim2.new(0, w, f.Size.Y.Scale, f.Size.Y.Offset);
+		end;
+	end;
+end;
+
+function Fatality:SetGlobalSliderHeight(h)
+	for _, f in ipairs(Fatality.SliderValueFrames) do
+		if typeof(f) == "Instance" and f.Parent then
+			f.Size = UDim2.new(0, f.Size.X.Offset, 0, h);
+		end;
+	end;
+end;
+
+function Fatality:SetGlobalDropdownWidth(w)
+	Fatality.GlobalDropdownWidth = w;
+	for _, f in ipairs(Fatality.DropdownValueFrames) do
+		if typeof(f) == "Instance" and f.Parent then
+			f.Size = UDim2.new(0, w, f.Size.Y.Scale, f.Size.Y.Offset);
+		end;
+	end;
+end;
+
+function Fatality:SetGlobalDropdownHeight(h)
+	for _, f in ipairs(Fatality.DropdownValueFrames) do
+		if typeof(f) == "Instance" and f.Parent then
+			f.Size = UDim2.new(0, f.Size.X.Offset, 0, h);
+		end;
+	end;
+end;
 Fatality.Version = '1.6';
 Fatality.Lucide = {
 	["lucide-accessibility"] = "rbxassetid://10709751939",
@@ -1344,7 +1383,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	local ModeFrame     = Instance.new("Frame");
 	local ModeFrameCorner = Instance.new("UICorner");
 	local ModeText      = Instance.new("TextLabel");
-	local ModeCaret     = Instance.new("TextLabel");
+	local ModeCaret     = Instance.new("ImageLabel");
 	local ModeClickBtn  = Instance.new("TextButton");
 
 	-- ── floating mode list (parented to OwnWindow) ────────────────
@@ -1472,13 +1511,14 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	ModeCaret.BackgroundTransparency = 1;
 	ModeCaret.BorderSizePixel     = 0;
 	ModeCaret.Position            = UDim2.new(1,-3,0.5,0);
-	ModeCaret.Size                = UDim2.new(0,12,0,12);
+	ModeCaret.Size                = UDim2.new(0,10,0,10);
 	ModeCaret.ZIndex              = 153;
-	ModeCaret.FontFace            = Fatality.FontSemiBold;
-	ModeCaret.Text                = "▾";
-	ModeCaret.TextColor3          = Color3.fromRGB(255,255,255);
-	ModeCaret.TextSize            = 10;
-	ModeCaret.TextTransparency    = 0.50;
+	ModeCaret.BackgroundTransparency = 1;
+	ModeCaret.BorderSizePixel     = 0;
+	ModeCaret.Image               = "rbxassetid://10709790948";
+	ModeCaret.ImageColor3         = Color3.fromRGB(255,255,255);
+	ModeCaret.ImageTransparency   = 0.40;
+	ModeCaret.ScaleType           = Enum.ScaleType.Fit;
 
 	ModeClickBtn.Name             = Fatality:RandomString();
 	ModeClickBtn.Parent           = ModeFrame;
@@ -1643,18 +1683,43 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	SliderBg.ZIndex               = 152;
 	SliderBg.ClipsDescendants     = true;
 
-	SliderBgCorner.CornerRadius   = UDim.new(1,0);
+	SliderBgCorner.CornerRadius   = UDim.new(0,4);
 	SliderBgCorner.Parent         = SliderBg;
 
+	-- outermost shadow ring
 	SliderFill.Name               = Fatality:RandomString();
 	SliderFill.Parent             = SliderBg;
-	SliderFill.BackgroundColor3   = Fatality.Colors.Main;
+	SliderFill.BackgroundColor3   = Color3.fromRGB(95,17,28);
 	SliderFill.BorderSizePixel    = 0;
+	SliderFill.ClipsDescendants   = true;
 	SliderFill.Position           = UDim2.new(0,0,0,0);
 	SliderFill.ZIndex             = 153;
 
-	SliderFillCorner.CornerRadius = UDim.new(1,0);
+	SliderFillCorner.CornerRadius = UDim.new(0,4);
 	SliderFillCorner.Parent       = SliderFill;
+
+	-- mid anti-alias ring
+	local SliderFillMid = Instance.new("Frame");
+	SliderFillMid.Name            = Fatality:RandomString();
+	SliderFillMid.Parent          = SliderFill;
+	SliderFillMid.BackgroundColor3= Color3.fromRGB(158,28,47);
+	SliderFillMid.BorderSizePixel = 0;
+	SliderFillMid.ClipsDescendants= true;
+	SliderFillMid.Position        = UDim2.new(0,0,0,1);
+	SliderFillMid.Size            = UDim2.new(1,0,1,-2);
+	SliderFillMid.ZIndex          = 153;
+	Instance.new("UICorner",SliderFillMid).CornerRadius = UDim.new(0,3);
+
+	-- main fill color
+	local SliderFillInner = Instance.new("Frame");
+	SliderFillInner.Name          = Fatality:RandomString();
+	SliderFillInner.Parent        = SliderFillMid;
+	SliderFillInner.BackgroundColor3 = Fatality.Colors.Main;
+	SliderFillInner.BorderSizePixel  = 0;
+	SliderFillInner.Position      = UDim2.new(0,0,0,1);
+	SliderFillInner.Size          = UDim2.new(1,0,1,-2);
+	SliderFillInner.ZIndex        = 153;
+	Instance.new("UICorner",SliderFillInner).CornerRadius = UDim.new(0,2);
 
 	SliderValText.Name            = Fatality:RandomString();
 	SliderValText.Parent          = SliderBg;
@@ -1679,7 +1744,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 		local norm = math.clamp((TargetValue - mn)/(mx2 - mn), 0, 1);
 		SliderFill.Size = UDim2.new(norm, 0, 1, 0);
 		local rd = SliderConfig.Round or 0;
-		SliderValText.Text = tostring(Fatality:Rounding(TargetValue, rd))..(SliderConfig.Type or "");
+		local vStr = tostring(Fatality:Rounding(TargetValue, rd))..(SliderConfig.Type or "");
+		SliderValText.Text = vStr;
 	end;
 
 	local function toggleModeList(bool)
@@ -1737,11 +1803,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	-- ── gear expand ───────────────────────────────────────────────
 	if isSlider then
 		-- init slider fill
-		local mn = SliderConfig.Min; local mx2 = SliderConfig.Max;
-		local norm = math.clamp((TargetValue - mn)/(mx2 - mn), 0, 1);
-		SliderFill.Size = UDim2.new(norm, 0, 1, 0);
-		local rd = SliderConfig.Round or 0;
-		SliderValText.Text = tostring(Fatality:Rounding(TargetValue, rd))..(SliderConfig.Type or "");
+		updateSliderFill();
 
 		Fatality:CreateHover(GearIcon, function(b)
 			Fatality:CreateAnimation(GearIcon, 0.25, { ImageTransparency = b and 0.20 or 0.45 });
@@ -3255,7 +3317,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Slider.BackgroundTransparency = 1.000
 		Slider.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Slider.BorderSizePixel = 0
-		Slider.Size = UDim2.new(1, -25, 0, 20)
+		Slider.Size = UDim2.new(1, -25, 0, 17)
 		Slider.ZIndex = ZIndex + 1
 
 		Fatality:AddDragBlacklist(Slider);
@@ -3284,9 +3346,10 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
-		ValueFrame.Size = UDim2.new(0, 85, 0.75, 0)
+		ValueFrame.Size = UDim2.new(0, Fatality.GlobalSliderWidth, 0.75, 0)
 		ValueFrame.ZIndex = ZIndex + 2
 		ValueFrame:SetAttribute("_hotkey_zone", true);
+		table.insert(Fatality.SliderValueFrames, ValueFrame);
 
 		UICorner.CornerRadius = UDim.new(0, 4)
 		UICorner.Parent = ValueFrame
@@ -3354,10 +3417,10 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueText.BorderSizePixel = 0
 		ValueText.Size = UDim2.new(1, 0, 1, 0)
 		ValueText.ZIndex = ZIndex + 4
-		ValueText.FontFace = Fatality.FontSemiBold
+		ValueText.FontFace = Font.new('rbxasset://fonts/families/GothamSSm.json', Enum.FontWeight.Bold, Enum.FontStyle.Normal)
 		ValueText.Text = string.format('%s%s',tostring(Config.Default),tostring(Config.Type));
 		ValueText.TextColor3 = Color3.fromRGB(255, 255, 255)
-		ValueText.TextSize = 9.000
+		ValueText.TextSize = 11.000
 		ValueText.TextStrokeTransparency = 0.850;
 		ValueText.TextTransparency = 0;
 
@@ -3853,8 +3916,9 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
-		ValueFrame.Size = UDim2.new(0, 75, 0.925000012, 0)
+		ValueFrame.Size = UDim2.new(0, Fatality.GlobalDropdownWidth, 0.925000012, 0)
 		ValueFrame.ZIndex = ZIndex + 4
+		table.insert(Fatality.DropdownValueFrames, ValueFrame);
 
 		UICorner.CornerRadius = UDim.new(0, 2)
 		UICorner.Parent = ValueFrame
@@ -6494,7 +6558,7 @@ function Fatality.new(Window: Window)
 			SectionName.FontFace = Fatality.FontSemiBold;
 			SectionName.Text = Config.Name
 			SectionName.TextColor3 = Color3.fromRGB(255, 255, 255)
-			SectionName.TextSize = 15.000
+			SectionName.TextSize = 12.000
 			SectionName.TextStrokeTransparency = 0.750
 			SectionName.TextXAlignment = Enum.TextXAlignment.Left
 
