@@ -3141,7 +3141,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.Name = Fatality:RandomString()
 		ValueFrame.Parent = Toggle
 		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
-		ValueFrame.BackgroundColor3 = Fatality.Colors.Black
+		ValueFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
@@ -3377,7 +3377,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.Name = Fatality:RandomString()
 		ValueFrame.Parent = Slider
 		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
-		ValueFrame.BackgroundColor3 = Fatality.Colors.Black
+		ValueFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
@@ -3980,7 +3980,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.Name = Fatality:RandomString()
 		ValueFrame.Parent = Dropdown
 		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
-		ValueFrame.BackgroundColor3 = Fatality.Colors.Black
+		ValueFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
@@ -5706,7 +5706,7 @@ function Fatality.new(Window: Window)
 		menu_name.Font = Enum.Font.GothamBold
 		menu_name.Text = Menu.Name
 		menu_name.TextColor3 = Color3.fromRGB(255, 255, 255)
-		menu_name.TextSize = 13.000
+		menu_name.TextSize = 11.000
 		menu_name.TextStrokeTransparency = 0.900
 		menu_name.TextTransparency = 0.150
 		menu_name.TextXAlignment = Enum.TextXAlignment.Left
@@ -6549,7 +6549,6 @@ function Fatality.new(Window: Window)
 
 			local Section = Instance.new("Frame")
 			local Elements = Instance.new("Frame")
-			local UIStroke = Instance.new("UIStroke")
 			local UICorner = Instance.new("UICorner")
 			local UIListLayout = Instance.new("UIListLayout")
 			local SpaceBox = Instance.new("Frame")
@@ -6561,10 +6560,6 @@ function Fatality.new(Window: Window)
 						BackgroundTransparency = 0
 					})
 
-					Fatality:CreateAnimation(UIStroke,0.5,{
-						Transparency = 0
-					})
-
 					Fatality:CreateAnimation(SectionName,0.5,{
 						TextStrokeTransparency = 0.750,
 						TextTransparency = 0
@@ -6572,10 +6567,6 @@ function Fatality.new(Window: Window)
 				else
 					Fatality:CreateAnimation(Section,0.5,{
 						BackgroundTransparency = 1
-					})
-
-					Fatality:CreateAnimation(UIStroke,0.5,{
-						Transparency = 1
 					})
 
 					Fatality:CreateAnimation(SectionName,0.5,{
@@ -6602,9 +6593,6 @@ function Fatality.new(Window: Window)
 			Elements.BorderSizePixel = 0
 			Elements.Position = UDim2.new(0.5, 0, 1, -1)
 			Elements.Size = UDim2.new(1, -5, 1, -10)
-
-			UIStroke.Color = Color3.fromRGB(29, 29, 29)
-			UIStroke.Parent = Elements
 
 			UICorner.CornerRadius = UDim.new(0, 2)
 			UICorner.Parent = Elements
