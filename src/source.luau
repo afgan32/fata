@@ -1287,8 +1287,9 @@ function Fatality:GetWindowFromElement(Element: GuiObject)
 	end;
 end;
 
-function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, SliderConfig)
+function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, SliderConfig, Callbacks)
 	-- SliderConfig: {Min,Max,Default,Round,Type} | nil  — only provided for sliders
+	-- Callbacks: {GetValue:()->any, SetValue:(v:any)->void} | nil — for live keybind behavior
 	local OwnWindow = Fatality:GetWindowFromElement(ParentToggle);
 	if not OwnWindow then
 		return { Open=function()end, Close=function()end, Toggle=function()end };
@@ -1839,6 +1840,54 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 			end;
 		end;
 	end);
+
+	-- ── live keybind behavior ─────────────────────────────────────
+	if Callbacks and Callbacks.SetValue then
+		local originalValue = nil;
+		local sliderToggleActive = false;
+
+		local function keyMatches(input)
+			if not CurrentKey then return false end;
+			if typeof(CurrentKey) == 'EnumItem' then
+				return input.KeyCode == CurrentKey;
+			end;
+			local ks = tostring(CurrentKey);
+			if ks == "MouseLeft"  then return input.UserInputType == Enum.UserInputType.MouseButton1 end;
+			if ks == "MouseRight" then return input.UserInputType == Enum.UserInputType.MouseButton2 end;
+			return input.KeyCode.Name == ks;
+		end;
+
+		UserInputService.InputBegan:Connect(function(input, isTyping)
+			if isTyping or not keyMatches(input) then return end;
+			local mode = Modes[ModeIndex];
+			if mode == "Toggle" then
+				if isSlider then
+					sliderToggleActive = not sliderToggleActive;
+					if sliderToggleActive then
+						originalValue = Callbacks.GetValue();
+						Callbacks.SetValue(TargetValue or SliderConfig.Default);
+					else
+						Callbacks.SetValue(originalValue ~= nil and originalValue or SliderConfig.Min);
+					end;
+				else
+					Callbacks.SetValue(not Callbacks.GetValue());
+				end;
+			elseif mode == "Hold" then
+				originalValue = Callbacks.GetValue();
+				Callbacks.SetValue(isSlider and (TargetValue or SliderConfig.Default) or true);
+			elseif mode == "Always" then
+				Callbacks.SetValue(isSlider and (TargetValue or SliderConfig.Default) or true);
+			end;
+		end);
+
+		UserInputService.InputEnded:Connect(function(input)
+			if Modes[ModeIndex] ~= "Hold" then return end;
+			if not keyMatches(input) then return end;
+			Callbacks.SetValue(isSlider
+				and (originalValue ~= nil and originalValue or SliderConfig.Default)
+				or false);
+		end);
+	end;
 
 	return {
 		Open    = function() TogglePopup(true)  end;
@@ -3128,7 +3177,15 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		end);
 
 		-- right-click the checkbox → open keybind popup
-		local HotkeyPopup = Fatality:CreateKeybindPopup(ValueFrame, Toggle);
+		local function _applyToggle(v)
+			Config.Default = v;
+			toggleImg(Config.Default);
+			Config.Callback(Config.Default);
+		end;
+		local HotkeyPopup = Fatality:CreateKeybindPopup(ValueFrame, Toggle, nil, {
+			GetValue = function() return Config.Default end;
+			SetValue = _applyToggle;
+		});
 		ToggleInputBtn.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton2 then
 				HotkeyPopup.Toggle();
@@ -3227,11 +3284,11 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
-		ValueFrame.Size = UDim2.new(0, 65, 0.75, 0)
+		ValueFrame.Size = UDim2.new(0, 85, 0.75, 0)
 		ValueFrame.ZIndex = ZIndex + 2
 		ValueFrame:SetAttribute("_hotkey_zone", true);
 
-		UICorner.CornerRadius = UDim.new(1, 0)
+		UICorner.CornerRadius = UDim.new(0, 4)
 		UICorner.Parent = ValueFrame
 		ValueFrame.ClipsDescendants = true
 
@@ -3252,14 +3309,42 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 
 		boxli.Name = Fatality:RandomString()
 		boxli.Parent = ValueFrame
-		boxli.BackgroundColor3 = Fatality.Colors.Main
+		boxli.BackgroundColor3 = Color3.fromRGB(95, 17, 28)
 		boxli.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		boxli.BorderSizePixel = 0
+		boxli.ClipsDescendants = true
 		boxli.Size = UDim2.new((Config.Default - Config.Min) / (Config.Max - Config.Min), 0, 1, 0)
 		boxli.ZIndex = ZIndex + 3
 
-		UICorner_2.CornerRadius = UDim.new(1, 0)
+		UICorner_2.CornerRadius = UDim.new(0, 4)
 		UICorner_2.Parent = boxli
+
+		-- anti-aliasing mid ring
+		local boxli_mid = Instance.new("Frame")
+		boxli_mid.Name = Fatality:RandomString()
+		boxli_mid.Parent = boxli
+		boxli_mid.BackgroundColor3 = Color3.fromRGB(158, 28, 47)
+		boxli_mid.BorderSizePixel = 0
+		boxli_mid.Position = UDim2.new(0, 0, 0, 1)
+		boxli_mid.Size = UDim2.new(1, 0, 1, -2)
+		boxli_mid.ClipsDescendants = true
+		boxli_mid.ZIndex = ZIndex + 3
+		local boxli_mid_corner = Instance.new("UICorner")
+		boxli_mid_corner.CornerRadius = UDim.new(0, 3)
+		boxli_mid_corner.Parent = boxli_mid
+
+		-- main fill
+		local boxli_fill = Instance.new("Frame")
+		boxli_fill.Name = Fatality:RandomString()
+		boxli_fill.Parent = boxli_mid
+		boxli_fill.BackgroundColor3 = Fatality.Colors.Main
+		boxli_fill.BorderSizePixel = 0
+		boxli_fill.Position = UDim2.new(0, 0, 0, 1)
+		boxli_fill.Size = UDim2.new(1, 0, 1, -2)
+		boxli_fill.ZIndex = ZIndex + 3
+		local boxli_fill_corner = Instance.new("UICorner")
+		boxli_fill_corner.CornerRadius = UDim.new(0, 2)
+		boxli_fill_corner.Parent = boxli_fill
 
 		ValueText.Name = Fatality:RandomString()
 		ValueText.Parent = ValueFrame
@@ -3381,12 +3466,24 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		end;
 
 		-- right-click slider → open keybind popup
+		local function _applySlider(v)
+			v = Fatality:Rounding(math.clamp(v, Config.Min, Config.Max), Config.Round);
+			Config.Default = v;
+			TweenService:Create(boxli, TweenInfo.new(0.2), {
+				Size = UDim2.new((v - Config.Min) / (Config.Max - Config.Min), 0, 1, 0)
+			}):Play();
+			ValueText.Text = string.format('%s%s', tostring(v), tostring(Config.Type));
+			Config.Callback(v);
+		end;
 		local SliderHotkeyPopup = Fatality:CreateKeybindPopup(ValueFrame, Slider, {
 			Min     = Config.Min,
 			Max     = Config.Max,
 			Default = Config.Default,
 			Round   = Config.Round,
 			Type    = Config.Type,
+		}, {
+			GetValue = function() return Config.Default end;
+			SetValue = _applySlider;
 		});
 		ValueFrame.InputBegan:Connect(function(Input)
 			if Input.UserInputType == Enum.UserInputType.MouseButton2 then
@@ -5256,6 +5353,18 @@ function Fatality.new(Window: Window)
 			end;
 		end
 	end)
+
+	function Fatal:SetSize(w, h)
+		local cw = FatalFrame.Size.X.Offset;
+		local ch = FatalFrame.Size.Y.Offset;
+		FatalFrame.Size = UDim2.new(0, w or cw, 0, h or ch);
+	end;
+
+	function Fatal:SetPosition(x, y)
+		local cx = FatalFrame.Position.X.Scale;
+		local cy = FatalFrame.Position.Y.Scale;
+		FatalFrame.Position = UDim2.new(x or cx, 0, y or cy, 0);
+	end;
 
 	function Fatal:SetUsername(name: string)
 		User_name.Text = name or Client.DisplayName;
