@@ -1287,7 +1287,7 @@ function Fatality:GetWindowFromElement(Element: GuiObject)
 	end;
 end;
 
-function Fatality:CreateOption(OptionButton: ImageButton): Elements
+function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): Elements
 	Fatality:CreateHover(OptionButton,function(bool)
 		if bool then
 			Fatality:CreateAnimation(OptionButton,0.5,{
@@ -1374,6 +1374,7 @@ function Fatality:CreateOption(OptionButton: ImageButton): Elements
 
 	local ToggleExt = function(bool)
 		if bool then
+			if #ScrollingFrame:GetChildren() <= 2 then return end
 			Bindable:SetAttribute('V',true);
 			Bindable:Fire(true);
 
@@ -1438,6 +1439,14 @@ function Fatality:CreateOption(OptionButton: ImageButton): Elements
 	OptionButton.MouseButton1Click:Connect(function()
 		ToggleExt(true);
 	end);
+
+	if ParentFrame then
+		ParentFrame.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton2 then
+				ToggleExt(true);
+			end;
+		end);
+	end
 
 	UserInputService.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -2563,7 +2572,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 				end;
 			end,
 			Flag = Config.Flag and (Config.Flag.."Toggle"),
-			Option = (Config.Option and Fatality:CreateOption(OptionButton)) or nil;
+			Option = Fatality:CreateOption(OptionButton, Toggle);
 		});
 
 		if Config.Flag then
@@ -2810,7 +2819,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 				end;
 			end,
 			Flag = Config.Flag and Config.Flag.."Slider",
-			Option = (Config.Option and Fatality:CreateOption(OptionButton)) or nil;
+			Option = Fatality:CreateOption(OptionButton, Slider);
 		});
 
 		if Config.Flag then
@@ -3048,7 +3057,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 				};
 			end,
 			Flag = Config.Flag and Config.Flag.."ColorPicker",
-			Option = (Config.Option and Fatality:CreateOption(OptionButton)) or nil;
+			Option = Fatality:CreateOption(OptionButton, ColorPicker);
 		});
 
 		if Config.Flag then
@@ -3301,7 +3310,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 				end
 			end,
 			Flag = Config.Flag and Config.Flag.."Dropdown",
-			Option = (Config.Option and Fatality:CreateOption(OptionButton)) or nil;
+			Option = Fatality:CreateOption(OptionButton, Dropdown);
 		});
 
 		if Config.Flag then
@@ -3535,7 +3544,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 				end;
 			end,
 			Flag = Config.Flag and Config.Flag.."Keybind",
-			Option = (Config.Option and Fatality:CreateOption(OptionButton)) or nil;
+			Option = Fatality:CreateOption(OptionButton, Keybind);
 		});
 
 		if Config.Flag then
@@ -5667,7 +5676,7 @@ function Fatality.new(Window: Window)
 					Config.Callback(Config.Default);
 				end,
 
-				Option = (Config.Option and Fatality:CreateOption(OptionButton)) or nil;
+				Option = (Config.Option and Fatality:CreateOption(OptionButton, nil)) or nil;
 			});
 
 			res:Refresh();
@@ -5782,7 +5791,7 @@ function Fatality.new(Window: Window)
 
 
 			UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
-				local MainScale = UIListLayout.AbsoluteContentSize.Y + 20 + Config.Height;
+				local MainScale = UIListLayout.AbsoluteContentSize.Y + 30 + Config.Height;
 
 				if not Menu.AutoFill then
 					Fatality:CreateAnimation(Section,0.25,{
