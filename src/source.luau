@@ -4026,7 +4026,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Value_Text.BackgroundTransparency = 1.000
 		Value_Text.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Value_Text.BorderSizePixel = 0
-		Value_Text.Position = UDim2.new(0, 3, 0.5, 0)
+		Value_Text.Position = UDim2.new(0, 6, 0.5, 0)
 		Value_Text.Size = UDim2.new(1, -18, 0.800000012, 0)
 		Value_Text.ZIndex = ZIndex + 5
 		Value_Text.FontFace = Fatality.FontSemiBold
@@ -4036,7 +4036,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		table.insert(Fatality.DropdownValueTexts, Value_Text);
 		Value_Text.TextTransparency = 0.500
 		Value_Text.TextXAlignment = Enum.TextXAlignment.Left
-		Value_Text.TextYAlignment = Enum.TextYAlignment.Top
+		Value_Text.TextYAlignment = Enum.TextYAlignment.Center
 		Value_Text.TextWrapped = true
 		Value_Text.TextTruncate = Enum.TextTruncate.SplitWord
 
@@ -6550,6 +6550,8 @@ function Fatality.new(Window: Window)
 			local Section = Instance.new("Frame")
 			local Elements = Instance.new("Frame")
 			local UICorner = Instance.new("UICorner")
+			local SectionCorner = Instance.new("UICorner")
+			local SectionStroke = Instance.new("UIStroke")
 			local UIListLayout = Instance.new("UIListLayout")
 			local SpaceBox = Instance.new("Frame")
 			local SectionName = Instance.new("TextLabel")
@@ -6583,6 +6585,12 @@ function Fatality.new(Window: Window)
 			Section.BorderSizePixel = 0
 			Section.ClipsDescendants = true
 			Section.Size = UDim2.new(1, 0, 0, 0)
+
+			SectionCorner.CornerRadius = UDim.new(0, 3)
+			SectionCorner.Parent = Section
+
+			SectionStroke.Color = Color3.fromRGB(41, 41, 41)
+			SectionStroke.Parent = Section
 
 			Elements.Name = Fatality:RandomString()
 			Elements.Parent = Section
