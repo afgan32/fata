@@ -5248,7 +5248,7 @@ function Fatality.new(Window: Window)
 	FatalFrame.Name = Fatality:RandomString()
 	FatalFrame.Parent = Fatalitywin
 	FatalFrame.AnchorPoint = Vector2.new(0.5, 0)
-	FatalFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+	FatalFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 	FatalFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	FatalFrame.BorderSizePixel = 0
 	FatalFrame.Position = UDim2.new(0.5, 0, 0.2);
@@ -5281,7 +5281,7 @@ function Fatality.new(Window: Window)
 	Header.Name = Fatality:RandomString()
 	Header.Parent = FatalFrame
 	Header.Active = true
-	Header.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
+	Header.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 	Header.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Header.BorderSizePixel = 0
 	Header.Size = UDim2.new(1, 0, 0, 40)
@@ -5443,7 +5443,7 @@ function Fatality.new(Window: Window)
 	Bottom.Parent = FatalFrame
 	Bottom.Active = true
 	Bottom.AnchorPoint = Vector2.new(0, 1)
-	Bottom.BackgroundColor3 = Color3.fromRGB(21, 21, 21)
+	Bottom.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 	Bottom.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	Bottom.BorderSizePixel = 0
 	Bottom.Position = UDim2.new(0, 0, 1, 0)
@@ -6598,7 +6598,7 @@ function Fatality.new(Window: Window)
 
 			Section.Name = Fatality:RandomString()
 			Section.Parent = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
-			Section.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+			Section.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 			Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Section.BorderSizePixel = 0
 			Section.ClipsDescendants = true
