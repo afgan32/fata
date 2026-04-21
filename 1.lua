@@ -1441,11 +1441,19 @@ function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): E
 	end);
 
 	if ParentFrame then
-		ParentFrame.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton2 then
-				ToggleExt(true);
-			end;
-		end);
+		local function bindRCC(obj)
+			obj.InputBegan:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseButton2 then
+					ToggleExt(true);
+				end;
+			end)
+		end
+		bindRCC(ParentFrame)
+		for _, child in ipairs(ParentFrame:GetDescendants()) do
+			if child:IsA("GuiObject") then
+				bindRCC(child)
+			end
+		end
 	end
 
 	UserInputService.InputBegan:Connect(function(input)
