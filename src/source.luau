@@ -2885,7 +2885,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 					DropdownItemFrame.Position = UDim2.fromOffset(Parent.AbsolutePosition.X - Window.AbsolutePosition.X,Parent.AbsolutePosition.Y + Parent.AbsoluteSize.Y - Window.AbsolutePosition.Y)
 
 					Fatality:CreateAnimation(DropdownItemFrame,0.35,{
-						Size = UDim2.new(0, 175, 0, math.clamp(baseSize,0,200))
+						Size = UDim2.new(0, 145, 0, math.clamp(baseSize,0,250))
 					})
 				end;
 			end)
@@ -2904,7 +2904,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 			end;
 
 			Fatality:CreateAnimation(DropdownItemFrame,0.35,{
-				Size = UDim2.new(0, 175, 0, 0)
+				Size = UDim2.new(0, 145, 0, 0)
 			})
 
 			Fatality:CreateAnimation(UIStroke,0.35,{
@@ -2966,7 +2966,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 
 	UIListLayout.Parent = ScrollingFrame
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	UIListLayout.Padding = UDim.new(0, 5)
+	UIListLayout.Padding = UDim.new(0, 8)
 
 	UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
 		ScrollingFrame.CanvasSize = UDim2.fromOffset(0,UIListLayout.AbsoluteContentSize.Y + 4)
@@ -3065,13 +3065,20 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 		end,
 	});
 
+	local IsDropdownOpen = false;
 	Fatality:NewInput(Parent,function()
-		if AutoUpdate then
-			res:refresh();
+		if IsDropdownOpen then
+			func(false);
+			Toggle(false);
+			IsDropdownOpen = false;
+		else
+			if AutoUpdate then
+				res:refresh();
+			end;
+			func(true);
+			Toggle(true);
+			IsDropdownOpen = true;
 		end;
-
-		func(true);
-		Toggle(true);
 	end);
 
 	UserInputService.InputBegan:Connect(function(Input)
@@ -3079,6 +3086,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 			if not Fatality:IsMouseOverFrame(DropdownItemFrame) then
 				func(false);
 				Toggle(false);
+				IsDropdownOpen = false;
 			end;
 		end;
 	end);
@@ -4283,6 +4291,15 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueText.TextTransparency = 0.400
 
 		local IsBinding = false;
+
+		ValueFrame.InputBegan:Connect(function(Input)
+			if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+				CurrentKey = nil;
+				ValueText.Text = GetKeyName(nil);
+				Config.Callback(nil);
+			end;
+		end);
+
 		Fatality:NewInput(ValueFrame,function()
 			if IsBinding then
 				return;
@@ -5089,6 +5106,10 @@ function Fatality.new(Window: Window)
 				BackgroundTransparency = 0.5,
 			})
 
+			Fatality:CreateAnimation(MenuFrame,0.5,{
+				BackgroundTransparency = 0,
+			})
+
 			Fatality:CreateAnimation(InfoButton,0.25,{
 				ImageTransparency = 0.5
 			})
@@ -5186,6 +5207,10 @@ function Fatality.new(Window: Window)
 			})
 
 			Fatality:CreateAnimation(HeaderLineShadow_2,0.5,{
+				BackgroundTransparency = 1,
+			})
+
+			Fatality:CreateAnimation(MenuFrame,0.5,{
 				BackgroundTransparency = 1,
 			})
 
@@ -6211,7 +6236,7 @@ function Fatality.new(Window: Window)
 			UIListLayout.Parent = ScrollingFrame
 			UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 			UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-			UIListLayout.Padding = UDim.new(0, 5)
+			UIListLayout.Padding = UDim.new(0, 8)
 
 			UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
 				local all = (#ScrollingFrame:GetChildren() - 1);
