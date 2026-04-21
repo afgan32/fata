@@ -3607,6 +3607,8 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 			Fatality.WindowFlags[FatalWindow][Config.Flag.."Slider"] = Respons;
 		end;
 
+		Config.Callback(Config.Default);
+
 		return Respons;
 	end;
 
