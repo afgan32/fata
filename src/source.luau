@@ -304,8 +304,11 @@ Fatality.DragBlacklist = {};
 -- global element registries for resize control
 Fatality.SliderValueFrames    = {};
 Fatality.DropdownValueFrames  = {};
-Fatality.GlobalSliderWidth    = 85;
-Fatality.GlobalDropdownWidth  = 75;
+Fatality.DropdownValueTexts   = {};
+Fatality.SectionColumnFrames  = {};
+Fatality.GlobalSliderWidth    = 82;
+Fatality.GlobalDropdownWidth  = 83;
+Fatality.GlobalDropdownHeight = 23;
 
 function Fatality:SetGlobalSliderWidth(w)
 	Fatality.GlobalSliderWidth = w;
@@ -334,9 +337,27 @@ function Fatality:SetGlobalDropdownWidth(w)
 end;
 
 function Fatality:SetGlobalDropdownHeight(h)
+	Fatality.GlobalDropdownHeight = h;
+	-- proportional text size: base is 23px height → 13pt text
+	local tSize = math.max(8, math.floor(h * 0.565));
 	for _, f in ipairs(Fatality.DropdownValueFrames) do
 		if typeof(f) == "Instance" and f.Parent then
 			f.Size = UDim2.new(0, f.Size.X.Offset, 0, h);
+		end;
+	end;
+	for _, t in ipairs(Fatality.DropdownValueTexts) do
+		if typeof(t) == "Instance" and t.Parent then
+			t.TextSize = tSize;
+		end;
+	end;
+end;
+
+function Fatality:SetSectionColumnWidth(scale)
+	for _, cols in ipairs(Fatality.SectionColumnFrames) do
+		if cols and cols.L and cols.L.Parent then
+			cols.L.Size = UDim2.new(scale, 0, cols.L.Size.Y.Scale, cols.L.Size.Y.Offset);
+			cols.C.Size = UDim2.new(scale, 0, cols.C.Size.Y.Scale, cols.C.Size.Y.Offset);
+			cols.R.Size = UDim2.new(scale, 0, cols.R.Size.Y.Scale, cols.R.Size.Y.Offset);
 		end;
 	end;
 end;
@@ -3916,7 +3937,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
-		ValueFrame.Size = UDim2.new(0, Fatality.GlobalDropdownWidth, 0.925000012, 0)
+		ValueFrame.Size = UDim2.new(0, Fatality.GlobalDropdownWidth, 0, Fatality.GlobalDropdownHeight)
 		ValueFrame.ZIndex = ZIndex + 4
 		table.insert(Fatality.DropdownValueFrames, ValueFrame);
 
@@ -3964,7 +3985,8 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Value_Text.FontFace = Fatality.FontSemiBold
 		Value_Text.Text = DataParser(Config.Default)
 		Value_Text.TextColor3 = Color3.fromRGB(255, 255, 255)
-		Value_Text.TextSize = 10.000
+		Value_Text.TextSize = math.max(8, math.floor(Fatality.GlobalDropdownHeight * 0.565));
+		table.insert(Fatality.DropdownValueTexts, Value_Text);
 		Value_Text.TextTransparency = 0.500
 		Value_Text.TextXAlignment = Enum.TextXAlignment.Left
 		Value_Text.TextYAlignment = Enum.TextYAlignment.Top
@@ -5430,6 +5452,17 @@ function Fatality.new(Window: Window)
 		FatalFrame.Position = UDim2.new(x or cx, 0, y or cy, 0);
 	end;
 
+	function Fatal:SetHeaderHeight(h)
+		Header.Size          = UDim2.new(1, 0, 0, h);
+		MenuFrame.Position   = UDim2.new(0, 0, 0, h + 10);
+		MenuFrame.Size       = UDim2.new(1, 0, 1, -(h + 42));
+	end;
+
+	function Fatal:SetSectionColumnWidth(scale)
+		Fatality.GlobalSectionColumnWidth = scale;
+		Fatality:SetSectionColumnWidth(scale);
+	end;
+
 	function Fatal:SetUsername(name: string)
 		User_name.Text = name or Client.DisplayName;
 	end;
@@ -5667,7 +5700,7 @@ function Fatality.new(Window: Window)
 		Left.BorderSizePixel = 0
 		Left.ClipsDescendants = false
 		Left.Position = UDim2.new(0.175, 0, 0.5, 0)
-		Left.Size = UDim2.new(0.32, 0, 1, -5)
+		Left.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Left.ScrollBarThickness = 0
 
 		UIListLayout.Parent = Left
@@ -5686,7 +5719,7 @@ function Fatality.new(Window: Window)
 		Center.BorderSizePixel = 0
 		Center.ClipsDescendants = false
 		Center.Position = UDim2.new(0.5, 0, 0.5, 0)
-		Center.Size = UDim2.new(0.32, 0, 1, -5)
+		Center.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Center.ScrollBarThickness = 0
 
 		UIListLayout_2.Parent = Center
@@ -5705,7 +5738,7 @@ function Fatality.new(Window: Window)
 		Right.BorderSizePixel = 0
 		Right.ClipsDescendants = false
 		Right.Position = UDim2.new(0.825, 0, 0.5, 0)
-		Right.Size = UDim2.new(0.32, 0, 1, -5)
+		Right.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Right.ScrollBarThickness = 0
 
 		UIListLayout_3.Parent = Right
@@ -5713,6 +5746,8 @@ function Fatality.new(Window: Window)
 		UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
 		UIListLayout_3.Padding = UDim.new(0, 8)
 		UIListLayout_3.VerticalFlex = (Menu.AutoFill and Enum.UIFlexAlignment.Fill) or Enum.UIFlexAlignment.None;
+
+		table.insert(Fatality.SectionColumnFrames, { L = Left, C = Center, R = Right });
 
 		local BindEvent = Instance.new('BindableEvent',MenuLiber);
 		BindEvent.Name = Fatality:RandomString();
