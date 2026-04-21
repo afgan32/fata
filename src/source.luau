@@ -3318,6 +3318,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Config.Option = Config.Option or false;
 		Config.Callback = Config.Callback or function(number) end;
 		Config.Flag = Config.Flag or nil;
+		Config.ApplyOnRelease = Config.ApplyOnRelease or false;
 
 		local Slider = Instance.new("Frame")
 		local Slider_Name = Instance.new("TextLabel")
@@ -3509,7 +3510,9 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 			Config.Default = Value;
 			ValueText.Text = string.format('%s%s',tostring(Config.Default),tostring(Config.Type));
 
-			Config.Callback(Value)
+			if not Config.ApplyOnRelease then
+				Config.Callback(Value);
+			end;
 		end;
 
 		do
@@ -3529,8 +3532,20 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 					else
 						IsHold = false
 					end;
+					if Config.ApplyOnRelease then
+						Config.Callback(Config.Default);
+					end;
 				end
 			end)
+
+			UserInputService.InputEnded:Connect(function(Input)
+				if IsHold and (Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch) then
+					IsHold = false;
+					if Config.ApplyOnRelease then
+						Config.Callback(Config.Default);
+					end;
+				end;
+			end);
 
 			UserInputService.InputChanged:Connect(function(Input)
 				if IsHold then
@@ -3543,6 +3558,28 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 							end;
 						else
 							update(Input)
+						end;
+					end;
+				end;
+			end);
+			-- Ctrl + scroll wheel to adjust value
+			UserInputService.InputChanged:Connect(function(Input)
+				if Input.UserInputType == Enum.UserInputType.MouseWheel then
+					if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
+						if Fatality:IsMouseOverFrame(ValueFrame) then
+							local step = 1 / (10 ^ Config.Round);
+							local dir  = Input.Position.Z;
+							local newVal = Fatality:Rounding(
+								math.clamp(Config.Default + dir * step, Config.Min, Config.Max),
+								Config.Round
+							);
+							Config.Default = newVal;
+							local normalized = (newVal - Config.Min) / (Config.Max - Config.Min);
+							TweenService:Create(boxli, TweenInfo.new(0.1), {
+								Size = UDim2.new(normalized, 0, 1, 0)
+							}):Play();
+							ValueText.Text = string.format('%s%s', tostring(newVal), tostring(Config.Type));
+							Config.Callback(newVal);
 						end;
 					end;
 				end;
