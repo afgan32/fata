@@ -1198,6 +1198,17 @@ function Fatality:GetTextSize(Text : TextLabel,CustomFont: Enum.Font) : Vector2
 end;
 
 function Fatality:IsMouseOverFrame(Frame : Frame) : boolean
+	local current = Frame;
+	while current do
+		if current:IsA("GuiObject") and not current.Visible then
+			return false;
+		end;
+		if current:IsA("ScreenGui") and not current.Enabled then
+			return false;
+		end;
+		current = current.Parent;
+	end;
+
 	local AbsPos: Vector2, AbsSize: Vector2 = Frame.AbsolutePosition, Frame.AbsoluteSize;
 
 	if Mouse.X >= AbsPos.X and Mouse.X <= AbsPos.X + AbsSize.X and Mouse.Y >= AbsPos.Y and Mouse.Y <= AbsPos.Y + AbsSize.Y then
