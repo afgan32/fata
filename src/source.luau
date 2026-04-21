@@ -1198,6 +1198,12 @@ function Fatality:GetTextSize(Text : TextLabel,CustomFont: Enum.Font) : Vector2
 end;
 
 function Fatality:IsMouseOverFrame(Frame : Frame) : boolean
+	local AbsPos: Vector2, AbsSize: Vector2 = Frame.AbsolutePosition, Frame.AbsoluteSize;
+
+	if Mouse.X < AbsPos.X or Mouse.X > AbsPos.X + AbsSize.X or Mouse.Y < AbsPos.Y or Mouse.Y > AbsPos.Y + AbsSize.Y then
+		return false;
+	end;
+
 	local current = Frame;
 	while current do
 		if current:IsA("GuiObject") and not current.Visible then
@@ -1209,11 +1215,7 @@ function Fatality:IsMouseOverFrame(Frame : Frame) : boolean
 		current = current.Parent;
 	end;
 
-	local AbsPos: Vector2, AbsSize: Vector2 = Frame.AbsolutePosition, Frame.AbsoluteSize;
-
-	if Mouse.X >= AbsPos.X and Mouse.X <= AbsPos.X + AbsSize.X and Mouse.Y >= AbsPos.Y and Mouse.Y <= AbsPos.Y + AbsSize.Y then
-		return true;
-	end;
+	return true;
 end;
 
 function Fatality:GetCalculatePosition(planePos: number, planeNormal: Vector3, rayOrigin: number, rayDirection: Vector3) : number
@@ -2821,7 +2823,7 @@ end;
 
 function Fatality:AddDragBlacklist(Frame: Frame)
 	Frame.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.MouseMovement then
+		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
 			local finder = table.find(Fatality.DragBlacklist , Frame);
 
 			if not finder then
@@ -2831,7 +2833,7 @@ function Fatality:AddDragBlacklist(Frame: Frame)
 	end);
 
 	Frame.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.MouseMovement then
+		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
 			local finder = table.find(Fatality.DragBlacklist , Frame);
 
 			if finder then
@@ -3511,12 +3513,9 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 			local SizeScale = math.clamp((((Input.Position.X) - ValueFrame.AbsolutePosition.X) / ValueFrame.AbsoluteSize.X), 0, 1);
 			local Main = ((Config.Max - Config.Min) * SizeScale) + Config.Min;
 			local Value = Fatality:Rounding(Main,Config.Round);
-			local PositionX = UDim2.fromScale(SizeScale, 1);
 			local normalized = (Value - Config.Min) / (Config.Max - Config.Min);
 
-			TweenService:Create(boxli , TweenInfo.new(0.2),{
-				Size = UDim2.new(normalized, 0, 1, 0)
-			}):Play();
+			boxli.Size = UDim2.new(normalized, 0, 1, 0);
 
 			Config.Default = Value;
 			ValueText.Text = string.format('%s%s',tostring(Config.Default),tostring(Config.Type));
@@ -3586,9 +3585,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 							);
 							Config.Default = newVal;
 							local normalized = (newVal - Config.Min) / (Config.Max - Config.Min);
-							TweenService:Create(boxli, TweenInfo.new(0.1), {
-								Size = UDim2.new(normalized, 0, 1, 0)
-							}):Play();
+							boxli.Size = UDim2.new(normalized, 0, 1, 0);
 							ValueText.Text = string.format('%s%s', tostring(newVal), tostring(Config.Type));
 							Config.Callback(newVal);
 						end;
@@ -6599,7 +6596,7 @@ function Fatality.new(Window: Window)
 			Elements.Name = Fatality:RandomString()
 			Elements.Parent = Section
 			Elements.AnchorPoint = Vector2.new(0.5, 1)
-			Elements.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+			Elements.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 			Elements.BackgroundTransparency = 0
 			Elements.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Elements.BorderSizePixel = 0
