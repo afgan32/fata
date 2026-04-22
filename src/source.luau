@@ -2926,6 +2926,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 	DropdownItemFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	DropdownItemFrame.BorderSizePixel = 0
 	DropdownItemFrame.ClipsDescendants = true
+	DropdownItemFrame.Active = true
 	DropdownItemFrame.Position = UDim2.new(4,0,4,0)
 	DropdownItemFrame.Size = UDim2.new(0, 175, 0, 100)
 	DropdownItemFrame.ZIndex = 100
@@ -3066,18 +3067,30 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 	});
 
 	local IsDropdownOpen = false;
+	local CloseDropdown = function()
+		if IsDropdownOpen then
+			func(false);
+			Toggle(false);
+			IsDropdownOpen = false;
+		end;
+	end;
 	Fatality:NewInput(Parent,function()
 		if IsDropdownOpen then
 			func(false);
 			Toggle(false);
 			IsDropdownOpen = false;
+			Fatality.CurrentDropdown = nil;
 		else
+			if Fatality.CurrentDropdown then
+				Fatality.CurrentDropdown();
+			end;
 			if AutoUpdate then
 				res:refresh();
 			end;
 			func(true);
 			Toggle(true);
 			IsDropdownOpen = true;
+			Fatality.CurrentDropdown = CloseDropdown;
 		end;
 	end);
 
@@ -3087,6 +3100,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 				func(false);
 				Toggle(false);
 				IsDropdownOpen = false;
+				Fatality.CurrentDropdown = nil;
 			end;
 		end;
 	end);
@@ -6608,7 +6622,7 @@ function Fatality.new(Window: Window)
 			Section.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 			Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Section.BorderSizePixel = 0
-			Section.ClipsDescendants = true
+			Section.ClipsDescendants = false
 			Section.Size = UDim2.new(1, 0, 0, 0)
 
 			SectionCorner.CornerRadius = UDim.new(0, 3)
