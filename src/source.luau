@@ -1054,7 +1054,7 @@ Fatality.Lucide = {
 	["lucide-siren"] = "rbxassetid://10734961284",
 	["lucide-skip-back"] = "rbxassetid://10734961526",
 	["lucide-skip-forward"] = "rbxassetid://10734961809",
-	["lucide-skull"] = "rbxassetid://105823121760863",
+	["lucide-skull"] = "rbxassetid://10734962068",
 	["lucide-slack"] = "rbxassetid://10734962339",
 	["lucide-slash"] = "rbxassetid://10734962600",
 	["lucide-slice"] = "rbxassetid://10734963024",
@@ -4016,12 +4016,12 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 
 		icon.Name = Fatality:RandomString()
 		icon.Parent = ValueFrame
-		icon.AnchorPoint = Vector2.new(1, 0)
+		icon.AnchorPoint = Vector2.new(1, 0.5)
 		icon.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		icon.BackgroundTransparency = 1.000
 		icon.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		icon.BorderSizePixel = 0
-		icon.Position = UDim2.new(1, 0, 0, 0)
+		icon.Position = UDim2.new(1, 0, 0.5, 0)
 		icon.Size = UDim2.new(0,15,0,15)
 		icon.SizeConstraint = Enum.SizeConstraint.RelativeYY
 		icon.ZIndex = ZIndex + 5
@@ -6648,7 +6648,7 @@ function Fatality.new(Window: Window)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, 10, 0, 0)
+			SectionName.Position = UDim2.new(0, 10, 0, -7)
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.FontFace = Fatality.FontSemiBold;
 			SectionName.Text = Config.Name
@@ -6848,7 +6848,7 @@ function Fatality.new(Window: Window)
 		SearchFrame.Name = Fatality:RandomString()
 		SearchFrame.Parent = Fatalitywin;
 		SearchFrame.AnchorPoint = Vector2.new(0, 1)
-		SearchFrame.BackgroundColor3 = Color3.fromRGB(19, 19, 19)
+		SearchFrame.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 		SearchFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SearchFrame.BorderSizePixel = 0
 		SearchFrame.Position = UDim2.new(4,0,4,0)
@@ -6885,7 +6885,7 @@ function Fatality.new(Window: Window)
 		SearchBox.Name = Fatality:RandomString()
 		SearchBox.Parent = SearchFrame
 		SearchBox.AnchorPoint = Vector2.new(0.5, 0)
-		SearchBox.BackgroundColor3 = Fatality.Colors.Black
+		SearchBox.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 		SearchBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		SearchBox.BorderSizePixel = 0
 		SearchBox.Position = UDim2.new(0.5, 0, 0, 9)
