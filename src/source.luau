@@ -2871,8 +2871,20 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 
 	Fatality:AddDragBlacklist(DropdownItemFrame);
 
+	local ClickBlocker = nil;
+
 	local Toggle = function(value)
 		if value then
+			if not ClickBlocker then
+				ClickBlocker = Instance.new("Frame");
+				ClickBlocker.Name = Fatality:RandomString();
+				ClickBlocker.Parent = Window;
+				ClickBlocker.BackgroundTransparency = 1;
+				ClickBlocker.Size = UDim2.new(1, 0, 1, 0);
+				ClickBlocker.ZIndex = 99;
+				ClickBlocker.Active = true;
+			end;
+
 			if SPAWN_THREAD then
 				task.cancel(SPAWN_THREAD);
 				SPAWN_THREAD = nil;
@@ -2898,6 +2910,11 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 				ImageTransparency = 0.75
 			})
 		else
+			if ClickBlocker then
+				ClickBlocker:Destroy();
+				ClickBlocker = nil;
+			end;
+
 			if SPAWN_THREAD then
 				task.cancel(SPAWN_THREAD);
 				SPAWN_THREAD = nil;
@@ -2927,9 +2944,21 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 	DropdownItemFrame.BorderSizePixel = 0
 	DropdownItemFrame.ClipsDescendants = true
 	DropdownItemFrame.Active = true
-	DropdownItemFrame.Position = UDim2.new(4,0,4,0)
-	DropdownItemFrame.Size = UDim2.new(0, 175, 0, 100)
+	DropdownItemFrame.AutoLocalize = false
+	DropdownItemFrame.Position = UDim2.new(0,0,0,0)
+	DropdownItemFrame.Size = UDim2.new(0, 0, 0, 0)
 	DropdownItemFrame.ZIndex = 100
+
+	local Blocker = Instance.new("Frame")
+	Blocker.Name = Fatality:RandomString()
+	Blocker.Parent = DropdownItemFrame
+	Blocker.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Blocker.BackgroundTransparency = 1.000
+	Blocker.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Blocker.BorderSizePixel = 0
+	Blocker.Size = UDim2.new(1, 0, 1, 0)
+	Blocker.ZIndex = 101
+	Blocker.Active = true
 
 	UICorner.CornerRadius = UDim.new(0, 2)
 	UICorner.Parent = DropdownItemFrame
@@ -3096,7 +3125,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 
 	UserInputService.InputBegan:Connect(function(Input)
 		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-			if not Fatality:IsMouseOverFrame(DropdownItemFrame) then
+			if not Fatality:IsMouseOverFrame(DropdownItemFrame) and not Fatality:IsMouseOverFrame(Parent) then
 				func(false);
 				Toggle(false);
 				IsDropdownOpen = false;
@@ -6662,7 +6691,7 @@ function Fatality.new(Window: Window)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, 10, 0, -7)
+			SectionName.Position = UDim2.new(0, 10, 0, -12)
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
