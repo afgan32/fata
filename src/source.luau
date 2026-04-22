@@ -2983,7 +2983,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 		db_selected.Size = UDim2.new(1, 0, 0, 10)
 		db_selected.ZIndex = 110
 		db_selected.FontFace = Fatality.FontSemiBold
-		db_selected.TextColor3 = Fatality.Colors.Main
+		db_selected.TextColor3 = Color3.fromRGB(100, 100, 100)
 		db_selected.TextSize = 12.000
 		db_selected.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -3022,7 +3022,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 						Selected[v] = true
 						bth.TextColor3 = Fatality.Colors.Main;
 					else
-						bth.TextColor3 = Color3.fromRGB(255, 255, 255);
+						bth.TextColor3 = Color3.fromRGB(100, 100, 100);
 						Selected[v] = false
 					end
 
@@ -3032,7 +3032,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 						if Selected[v] then
 							bth.TextColor3 = Fatality.Colors.Main;
 						else
-							bth.TextColor3 = Color3.fromRGB(255, 255, 255);
+							bth.TextColor3 = Color3.fromRGB(100, 100, 100);
 						end;
 
 						Callback(Selected);
@@ -3044,12 +3044,12 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 
 						bth.TextColor3 = Fatality.Colors.Main;
 					else
-						bth.TextColor3 = Color3.fromRGB(255, 255, 255);
+						bth.TextColor3 = Color3.fromRGB(100, 100, 100);
 					end;
 
 					bth.MouseButton1Click:Connect(function()
 						if selectedmem then
-							selectedmem.TextColor3 = Color3.fromRGB(255, 255, 255);
+							selectedmem.TextColor3 = Color3.fromRGB(100, 100, 100);
 						end;
 
 						bth.TextColor3 = Fatality.Colors.Main;
@@ -5417,7 +5417,7 @@ function Fatality.new(Window: Window)
 	User_name.Text = Client.DisplayName;
 	User_name.TextColor3 = Color3.fromRGB(255, 255, 255)
 	User_name.TextSize = 13.000
-	User_name.TextStrokeTransparency = 0.700
+	User_name.TextStrokeTransparency = 1
 	User_name.TextXAlignment = Enum.TextXAlignment.Right
 
 	expire_days.Name = Fatality:RandomString()
@@ -5434,7 +5434,7 @@ function Fatality.new(Window: Window)
 	expire_days.Text = string.format("<font transparency=\"0.5\">expires:</font> <font color=\"#f53174\">%s</font>",Window.Expire)
 	expire_days.TextColor3 = Color3.fromRGB(255, 255, 255)
 	expire_days.TextSize = 12.000
-	expire_days.TextStrokeTransparency = 0.700
+	expire_days.TextStrokeTransparency = 1
 	expire_days.TextXAlignment = Enum.TextXAlignment.Right
 	expire_days.RichText = true;
 
@@ -6650,6 +6650,7 @@ function Fatality.new(Window: Window)
 			SectionName.BorderSizePixel = 0
 			SectionName.Position = UDim2.new(0, 10, 0, -7)
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
+			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
 			SectionName.Text = Config.Name
 			SectionName.TextColor3 = Color3.fromRGB(255, 255, 255)
