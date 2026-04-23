@@ -309,6 +309,7 @@ Fatality.SectionColumnFrames  = {};
 Fatality.GlobalSliderWidth    = 82;
 Fatality.GlobalDropdownWidth  = 83;
 Fatality.GlobalDropdownHeight = 23;
+Fatality.SectionNameYOffset   = -12;
 
 function Fatality:SetGlobalSliderWidth(w)
 	Fatality.GlobalSliderWidth = w;
@@ -348,6 +349,15 @@ function Fatality:SetGlobalDropdownHeight(h)
 	for _, t in ipairs(Fatality.DropdownValueTexts) do
 		if typeof(t) == "Instance" and t.Parent then
 			t.TextSize = tSize;
+		end;
+	end;
+end;
+
+function Fatality:SetSectionNameYOffset(y)
+	Fatality.SectionNameYOffset = y;
+	for _, cols in ipairs(Fatality.SectionColumnFrames) do
+		if cols and cols.SectionName and cols.SectionName.Parent then
+			cols.SectionName.Position = UDim2.new(0, 10, 0, y);
 		end;
 	end;
 end;
@@ -1451,7 +1461,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	PopupFrame.Name               = Fatality:RandomString();
 	PopupFrame.Parent             = OwnWindow;
 	PopupFrame.AnchorPoint        = Vector2.new(0.5, 0);
-	PopupFrame.BackgroundColor3   = Color3.fromRGB(24, 24, 24);
+	PopupFrame.BackgroundColor3   = Color3.fromRGB(38, 38, 38);
 	PopupFrame.BorderSizePixel    = 0;
 	PopupFrame.ClipsDescendants   = true;
 	PopupFrame.Position           = UDim2.new(4, 0, 4, 0);
@@ -1516,7 +1526,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	-- ── mode frame ────────────────────────────────────────────────
 	ModeFrame.Name                = Fatality:RandomString();
 	ModeFrame.Parent              = BottomRow;
-	ModeFrame.BackgroundColor3    = Color3.fromRGB(16,16,16);
+	ModeFrame.BackgroundColor3    = Color3.fromRGB(31,31,31);
 	ModeFrame.BorderSizePixel     = 0;
 	ModeFrame.Position            = UDim2.new(0,0,0,0);
 	ModeFrame.Size                = UDim2.new(0,74,1,0);
@@ -1647,16 +1657,21 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyFrame.Name                 = Fatality:RandomString();
 	KeyFrame.Parent               = BottomRow;
 	KeyFrame.AnchorPoint          = Vector2.new(1,0);
-	KeyFrame.BackgroundColor3     = Color3.fromRGB(16,16,16);
+	KeyFrame.BackgroundColor3     = Color3.fromRGB(38, 38, 38);
 	KeyFrame.BorderSizePixel      = 0;
 	KeyFrame.Position             = UDim2.new(1,0,0,0);
 	KeyFrame.Size                 = UDim2.new(0,34,1,0);
-	KeyFrame.ZIndex               = 152;
+	KeyFrameCorner.Name              = Fatality:RandomString();
+	KeyFrameCorner.Parent            = KeyFrame;
+	KeyFrameCorner.CornerRadius      = UDim.new(0, 5);
 
-	KeyFrameCorner.CornerRadius   = UDim.new(0,2);
-	KeyFrameCorner.Parent         = KeyFrame;
+	KeyStroke.Name      = Fatality:RandomString();
+	KeyStroke.Parent    = KeyFrame;
+	KeyStroke.Color     = Color3.fromRGB(31, 31, 31);
+	KeyStroke.Thickness = 1;
+	KeyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
 
-	KeyText.Name                  = Fatality:RandomString();
+	KeyText.Name                     = Fatality:RandomString();
 	KeyText.Parent                = KeyFrame;
 	KeyText.BackgroundTransparency= 1;
 	KeyText.BorderSizePixel       = 0;
@@ -4294,7 +4309,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.Name = Fatality:RandomString()
 		ValueFrame.Parent = Keybind
 		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
-		ValueFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
+		ValueFrame.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
@@ -6691,7 +6706,7 @@ function Fatality.new(Window: Window)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, 10, 0, -12)
+			SectionName.Position = UDim2.new(0, 10, 0, Fatality.SectionNameYOffset)
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
