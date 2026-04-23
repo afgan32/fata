@@ -309,7 +309,6 @@ Fatality.SectionColumnFrames  = {};
 Fatality.GlobalSliderWidth    = 82;
 Fatality.GlobalDropdownWidth  = 83;
 Fatality.GlobalDropdownHeight = 23;
-Fatality.SectionNameYOffset   = -12;
 
 function Fatality:SetGlobalSliderWidth(w)
 	Fatality.GlobalSliderWidth = w;
@@ -349,15 +348,6 @@ function Fatality:SetGlobalDropdownHeight(h)
 	for _, t in ipairs(Fatality.DropdownValueTexts) do
 		if typeof(t) == "Instance" and t.Parent then
 			t.TextSize = tSize;
-		end;
-	end;
-end;
-
-function Fatality:SetSectionNameYOffset(y)
-	Fatality.SectionNameYOffset = y;
-	for _, cols in ipairs(Fatality.SectionColumnFrames) do
-		if cols and cols.SectionName and cols.SectionName.Parent then
-			cols.SectionName.Position = UDim2.new(0, 10, 0, y);
 		end;
 	end;
 end;
@@ -1461,7 +1451,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	PopupFrame.Name               = Fatality:RandomString();
 	PopupFrame.Parent             = OwnWindow;
 	PopupFrame.AnchorPoint        = Vector2.new(0.5, 0);
-	PopupFrame.BackgroundColor3   = Color3.fromRGB(38, 38, 38);
+	PopupFrame.BackgroundColor3   = Color3.fromRGB(24, 24, 24);
 	PopupFrame.BorderSizePixel    = 0;
 	PopupFrame.ClipsDescendants   = true;
 	PopupFrame.Position           = UDim2.new(4, 0, 4, 0);
@@ -1526,7 +1516,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	-- ── mode frame ────────────────────────────────────────────────
 	ModeFrame.Name                = Fatality:RandomString();
 	ModeFrame.Parent              = BottomRow;
-	ModeFrame.BackgroundColor3    = Color3.fromRGB(31,31,31);
+	ModeFrame.BackgroundColor3    = Color3.fromRGB(16,16,16);
 	ModeFrame.BorderSizePixel     = 0;
 	ModeFrame.Position            = UDim2.new(0,0,0,0);
 	ModeFrame.Size                = UDim2.new(0,74,1,0);
@@ -1657,21 +1647,16 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyFrame.Name                 = Fatality:RandomString();
 	KeyFrame.Parent               = BottomRow;
 	KeyFrame.AnchorPoint          = Vector2.new(1,0);
-	KeyFrame.BackgroundColor3     = Color3.fromRGB(38, 38, 38);
+	KeyFrame.BackgroundColor3     = Color3.fromRGB(16,16,16);
 	KeyFrame.BorderSizePixel      = 0;
 	KeyFrame.Position             = UDim2.new(1,0,0,0);
 	KeyFrame.Size                 = UDim2.new(0,34,1,0);
-	KeyFrameCorner.Name              = Fatality:RandomString();
-	KeyFrameCorner.Parent            = KeyFrame;
-	KeyFrameCorner.CornerRadius      = UDim.new(0, 5);
+	KeyFrame.ZIndex               = 152;
 
-	KeyStroke.Name      = Fatality:RandomString();
-	KeyStroke.Parent    = KeyFrame;
-	KeyStroke.Color     = Color3.fromRGB(31, 31, 31);
-	KeyStroke.Thickness = 1;
-	KeyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+	KeyFrameCorner.CornerRadius   = UDim.new(0,2);
+	KeyFrameCorner.Parent         = KeyFrame;
 
-	KeyText.Name                     = Fatality:RandomString();
+	KeyText.Name                  = Fatality:RandomString();
 	KeyText.Parent                = KeyFrame;
 	KeyText.BackgroundTransparency= 1;
 	KeyText.BorderSizePixel       = 0;
@@ -4309,7 +4294,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.Name = Fatality:RandomString()
 		ValueFrame.Parent = Keybind
 		ValueFrame.AnchorPoint = Vector2.new(1, 0.5)
-		ValueFrame.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
+		ValueFrame.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
@@ -6706,7 +6691,7 @@ function Fatality.new(Window: Window)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, 10, 0, Fatality.SectionNameYOffset)
+			SectionName.Position = UDim2.new(0, 10, 0, -12)
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
@@ -6945,15 +6930,229 @@ function Fatality.new(Window: Window)
 		SearchBox.Parent = SearchFrame
 		SearchBox.AnchorPoint = Vector2.new(0.5, 0)
 		SearchBox.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
-mageTransparency = 0.750
-		DropShadow.ScaleType = Enum.ScaleType.Slice
-		DropShadow.SliceCenter = Rect.new(49, 49, 450, 450)
+		SearchBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		SearchBox.BorderSizePixel = 0
+		SearchBox.Position = UDim2.new(0.5, 0, 0, 9)
+		SearchBox.Size = UDim2.new(1, -15, 0, 25)
+		SearchBox.ZIndex = 101
 
-		SearchBox.Name = Fatality:RandomString()
-		SearchBox.Parent = SearchFrame
-		SearchBox.AnchorPoint = Vector2.new(0.5, 0)
-		SearchBox.BackgroundColor3 = Fatality.Colors.Black
-ocal _5 = Instance.new("Frame")
+		UICorner_2.CornerRadius = UDim.new(0, 2)
+		UICorner_2.Parent = SearchBox
+
+		UIStroke_2.Transparency = 0.650
+		UIStroke_2.Color = Color3.fromRGB(29, 29, 29)
+		UIStroke_2.Parent = SearchBox
+
+		TextBox.Parent = SearchBox
+		TextBox.AnchorPoint = Vector2.new(0.5, 0.5)
+		TextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		TextBox.BackgroundTransparency = 1.000
+		TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		TextBox.BorderSizePixel = 0
+		TextBox.Position = UDim2.new(0.5, 0, 0.5, 0)
+		TextBox.Size = UDim2.new(1, -15, 1, -5)
+		TextBox.ZIndex = 102
+		TextBox.ClearTextOnFocus = false
+		TextBox.FontFace = Fatality.FontSemiBold;
+		TextBox.PlaceholderText = "Search"
+		TextBox.Text = ""
+		TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TextBox.TextSize = 12.000
+		TextBox.TextXAlignment = Enum.TextXAlignment.Left
+
+		ScrollingFrame.Parent = SearchFrame
+		ScrollingFrame.Active = true
+		ScrollingFrame.AnchorPoint = Vector2.new(0.5, 0)
+		ScrollingFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		ScrollingFrame.BackgroundTransparency = 1.000
+		ScrollingFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		ScrollingFrame.BorderSizePixel = 0
+		ScrollingFrame.Position = UDim2.new(0.5, 0, 0, 40)
+		ScrollingFrame.Size = UDim2.new(1, -15, 1, -45)
+		ScrollingFrame.ZIndex = 102
+		ScrollingFrame.ScrollBarThickness = 0
+
+		UIListLayout.Parent = ScrollingFrame
+		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		UIListLayout.Padding = UDim.new(0, 4)
+
+		UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
+			ScrollingFrame.CanvasSize = UDim2.fromOffset(0,UIListLayout.AbsoluteContentSize.Y)
+		end)
+
+		SearchToggle(false);
+
+		Fatality:CreateHover(SearchButton,function(bool)
+			if bool then
+				Fatality:CreateAnimation(SearchButton,0.5,{
+					ImageTransparency = 0.1
+				})
+			else
+				Fatality:CreateAnimation(SearchButton,0.5,{
+					ImageTransparency = 0.5
+				})
+			end
+		end);
+
+		local SearchInformation = {};
+
+		local get_button = function(Name,Path,TAB_WARP)
+			local ResultFrame = Instance.new("Frame")
+			local UICorner = Instance.new("UICorner")
+			local FeatureName = Instance.new("TextLabel")
+			local FeaturePath = Instance.new("TextLabel")
+
+			ResultFrame.Name = Fatality:RandomString()
+			ResultFrame.Parent = ScrollingFrame;
+			ResultFrame.BackgroundColor3 = Fatality.Colors.Black
+			ResultFrame.BackgroundTransparency = 1.000
+			ResultFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			ResultFrame.BorderSizePixel = 0
+			ResultFrame.Size = UDim2.new(1, 0, 0, 42)
+			ResultFrame.ZIndex = 103
+
+			UICorner.CornerRadius = UDim.new(0, 4)
+			UICorner.Parent = ResultFrame
+
+			FeatureName.Name = Fatality:RandomString()
+			FeatureName.Parent = ResultFrame
+			FeatureName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			FeatureName.BackgroundTransparency = 1.000
+			FeatureName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			FeatureName.BorderSizePixel = 0
+			FeatureName.Position = UDim2.new(0, 6, 0, 5)
+			FeatureName.Size = UDim2.new(1, 0, 0, 15)
+			FeatureName.ZIndex = 104
+			FeatureName.FontFace = Fatality.FontSemiBold
+			FeatureName.Text = Name
+			FeatureName.TextColor3 = Color3.fromRGB(255, 255, 255)
+			FeatureName.TextSize = 14.000
+			FeatureName.TextXAlignment = Enum.TextXAlignment.Left
+
+			FeaturePath.Name = Fatality:RandomString()
+			FeaturePath.Parent = ResultFrame
+			FeaturePath.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			FeaturePath.BackgroundTransparency = 1.000
+			FeaturePath.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			FeaturePath.BorderSizePixel = 0
+			FeaturePath.Position = UDim2.new(0, 6, 0, 22)
+			FeaturePath.Size = UDim2.new(1, 0, 0, 15)
+			FeaturePath.ZIndex = 104
+			FeaturePath.FontFace = Fatality.FontSemiBold
+			FeaturePath.Text = Path
+			FeaturePath.TextColor3 = Color3.fromRGB(255, 255, 255)
+			FeaturePath.TextSize = 12.000
+			FeaturePath.TextTransparency = 0.500
+			FeaturePath.TextXAlignment = Enum.TextXAlignment.Left
+
+			local button = Fatality:NewInput(ResultFrame);
+
+			Fatality:CreateHover(button,function(bool)
+				if bool then
+					Fatality:CreateAnimation(ResultFrame,0.5,{
+						BackgroundTransparency = 0
+					})
+				else
+					Fatality:CreateAnimation(ResultFrame,0.5,{
+						BackgroundTransparency = 1
+					})
+				end
+			end);
+
+			button.MouseButton1Click:Connect(function()
+				if TAB_WARP then
+					for i,v in next , Fatal.Menus do
+						if v.Root == TAB_WARP.Root then
+							Fatal.MenuSelected = v;
+							v.ValueSelect(true)
+						else
+							v.ValueSelect(false)
+						end;
+					end;
+				end;
+			end);
+
+			return ResultFrame;
+		end
+
+		SearchButton.MouseButton1Click:Connect(function()
+			TextBox.Text = "";
+
+			SearchToggle(true);
+
+			table.clear(SearchInformation);
+
+			table.foreach(ScrollingFrame:GetChildren(),function(i,v)
+				if v:IsA('Frame') then
+					v:Destroy();
+				end;
+			end);
+
+			table.foreach(Fatal.ElementContents,function(i,v)
+				local button = get_button(v.Name,v.Path,v._TAB);
+
+				SearchInformation[v.Path.." - "..Fatality:RandomString()] = {
+					root = button,
+					callback = function()
+
+					end,
+				};
+			end);
+		end)
+
+		local DearchDelay = tick();
+
+		TextBox:GetPropertyChangedSignal('Text'):Connect(function()
+			DearchDelay = tick();
+
+			if not TextBox.Text:byte() then
+				for i,v in next , SearchInformation do
+					v.root.Visible = true;
+				end;
+
+				return;
+			end;
+
+			task.delay(0.5,function()
+				if (tick() - DearchDelay) > 0.5 then
+					for i,v in next , SearchInformation do
+						if string.find(tostring(string.lower(i)),string.lower(TextBox.Text),1,true) then
+							v.root.Visible = true;
+						else
+							v.root.Visible = false;
+						end;
+					end;
+				end;
+			end)
+		end);
+
+		UserInputService.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				if not Fatality:IsMouseOverFrame(SearchFrame) then
+					SearchToggle(false);
+				end
+			end
+		end)
+	end;
+
+	function Fatal:GetButton()
+		local backpack = Instance.new("ImageButton")
+		local UICorner = Instance.new("UICorner")
+		local RowLabel = Instance.new("Frame")
+		local UIListLayout = Instance.new("UIListLayout")
+		local StyledTextLabel = Instance.new("TextLabel")
+		local UITextSizeConstraint = Instance.new("UITextSizeConstraint")
+		local UIPadding = Instance.new("UIPadding")
+		local IconHost = Instance.new("Frame")
+		local IntegrationIconFrame = Instance.new("Frame")
+		local UIListLayout_2 = Instance.new("UIListLayout")
+		local IntegrationIcon = Instance.new("ImageLabel")
+		local SelectedHighlighter = Instance.new("Frame")
+		local corner = Instance.new("UICorner")
+		local Highlighter = Instance.new("Frame")
+		local corner_2 = Instance.new("UICorner")
+		local _5 = Instance.new("Frame")
 
 		backpack.Name = "FATALITY"..Fatality:RandomString();
 		backpack.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
