@@ -1672,11 +1672,11 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyInner.Parent               = KeyFrame;
 	KeyInner.BackgroundColor3     = Color3.fromRGB(45, 45, 45);
 	KeyInner.BorderSizePixel      = 0;
-	KeyInner.Position             = UDim2.new(0,2,0,1);
-	KeyInner.Size                 = UDim2.new(1,-4,1,-3);
+	KeyInner.Position             = UDim2.new(0,1,0,0);
+	KeyInner.Size                 = UDim2.new(1,-2,1,-3);
 	KeyInner.ZIndex               = 153;
 
-	KeyInnerCorner.CornerRadius   = UDim.new(0,4);
+	KeyInnerCorner.CornerRadius   = UDim.new(0,3);
 	KeyInnerCorner.Parent         = KeyInner;
 
 	KeyText.Name                  = Fatality:RandomString();
