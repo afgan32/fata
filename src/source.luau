@@ -1405,8 +1405,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	local SPAWN_THREAD = nil;
 	local MLIST_THREAD = nil;
 
-	local POPUP_H_BASE = 70;
-	local POPUP_H_GEAR = 102;
+	local POPUP_H_BASE = 78;
+	local POPUP_H_GEAR = 111;
 
 	-- ── main popup ────────────────────────────────────────────────
 	local PopupFrame    = Instance.new("Frame");
@@ -1521,8 +1521,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	BottomRow.Parent              = PopupFrame;
 	BottomRow.BackgroundTransparency = 1;
 	BottomRow.BorderSizePixel     = 0;
-	BottomRow.Position            = UDim2.new(0,8,0,38);
-	BottomRow.Size                = UDim2.new(1,-16,0,24);
+	BottomRow.Position            = UDim2.new(0,8,0,42);
+	BottomRow.Size                = UDim2.new(1,-16,0,28);
 	BottomRow.ZIndex              = 151;
 
 	-- ── mode frame ────────────────────────────────────────────────
@@ -1662,7 +1662,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyFrame.BackgroundColor3     = Color3.fromRGB(22, 22, 22);
 	KeyFrame.BorderSizePixel      = 0;
 	KeyFrame.Position             = UDim2.new(1,0,0,0);
-	KeyFrame.Size                 = UDim2.new(0,24,1,0);
+	KeyFrame.Size                 = UDim2.new(0,34,1,0);
 	KeyFrame.ZIndex               = 152;
 
 	KeyFrameCorner.CornerRadius   = UDim.new(0,4);
@@ -1704,7 +1704,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	GearDivider.Parent            = PopupFrame;
 	GearDivider.BackgroundColor3  = Color3.fromRGB(40,40,40);
 	GearDivider.BorderSizePixel   = 0;
-	GearDivider.Position          = UDim2.new(0,8,0,68);
+	GearDivider.Position          = UDim2.new(0,8,0,78);
 	GearDivider.Size              = UDim2.new(1,-16,0,1);
 	GearDivider.ZIndex            = 151;
 
@@ -1712,7 +1712,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	GearRow.Parent                = PopupFrame;
 	GearRow.BackgroundTransparency= 1;
 	GearRow.BorderSizePixel       = 0;
-	GearRow.Position              = UDim2.new(0,8,0,73);
+	GearRow.Position              = UDim2.new(0,8,0,83);
 	GearRow.Size                  = UDim2.new(1,-16,0,20);
 	GearRow.ZIndex                = 151;
 
