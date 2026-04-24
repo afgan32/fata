@@ -703,4 +703,28 @@ do
 			Fatality:SetDropdownPopupXOffset(v)
 		end
 	})
+
+	Settings:AddSlider({
+		Name = "Keybind Popup X Offset",
+		Default = 0,
+		Min = -80,
+		Max = 80,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetKeybindPopupXOffset(v)
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Keybind Popup Y Offset",
+		Default = 0,
+		Min = -40,
+		Max = 40,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetKeybindPopupYOffset(v)
+		end
+	})
 end
