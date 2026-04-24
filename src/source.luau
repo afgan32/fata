@@ -306,6 +306,7 @@ Fatality.SliderValueFrames    = {};
 Fatality.DropdownValueFrames  = {};
 Fatality.DropdownValueTexts   = {};
 Fatality.SectionColumnFrames  = {};
+Fatality.SectionNameLabels    = {};
 Fatality.GlobalSliderWidth    = 82;
 Fatality.GlobalDropdownWidth  = 83;
 Fatality.GlobalDropdownHeight = 23;
@@ -358,6 +359,15 @@ function Fatality:SetSectionColumnWidth(scale)
 			cols.L.Size = UDim2.new(scale, 0, cols.L.Size.Y.Scale, cols.L.Size.Y.Offset);
 			cols.C.Size = UDim2.new(scale, 0, cols.C.Size.Y.Scale, cols.C.Size.Y.Offset);
 			cols.R.Size = UDim2.new(scale, 0, cols.R.Size.Y.Scale, cols.R.Size.Y.Offset);
+		end;
+	end;
+end;
+
+function Fatality:SetSectionNameYOffset(y)
+	Fatality.SectionNameYOffset = y;
+	for _, label in ipairs(Fatality.SectionNameLabels) do
+		if typeof(label) == "Instance" and label.Parent then
+			label.Position = UDim2.new(0, 10, 0, y);
 		end;
 	end;
 end;
@@ -1433,6 +1443,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	-- ── key frame ─────────────────────────────────────────────────
 	local KeyFrame      = Instance.new("Frame");
 	local KeyFrameCorner= Instance.new("UICorner");
+	local KeyInner      = Instance.new("Frame");
+	local KeyInnerCorner= Instance.new("UICorner");
 	local KeyText       = Instance.new("TextLabel");
 	local KeyClickBtn   = Instance.new("TextButton");
 
@@ -1451,7 +1463,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	PopupFrame.Name               = Fatality:RandomString();
 	PopupFrame.Parent             = OwnWindow;
 	PopupFrame.AnchorPoint        = Vector2.new(0.5, 0);
-	PopupFrame.BackgroundColor3   = Color3.fromRGB(24, 24, 24);
+	PopupFrame.BackgroundColor3   = Color3.fromRGB(38, 38, 38);
 	PopupFrame.BorderSizePixel    = 0;
 	PopupFrame.ClipsDescendants   = true;
 	PopupFrame.Position           = UDim2.new(4, 0, 4, 0);
@@ -1484,7 +1496,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	-- ── Add hotkey button ─────────────────────────────────────────
 	AddHotkeyBtn.Name             = Fatality:RandomString();
 	AddHotkeyBtn.Parent           = PopupFrame;
-	AddHotkeyBtn.BackgroundTransparency = 1;
+	AddHotkeyBtn.BackgroundColor3 = Color3.fromRGB(31,31,31);
 	AddHotkeyBtn.BorderSizePixel  = 0;
 	AddHotkeyBtn.Position         = UDim2.new(0,0,0,0);
 	AddHotkeyBtn.Size             = UDim2.new(1,0,0,28);
@@ -1516,7 +1528,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	-- ── mode frame ────────────────────────────────────────────────
 	ModeFrame.Name                = Fatality:RandomString();
 	ModeFrame.Parent              = BottomRow;
-	ModeFrame.BackgroundColor3    = Color3.fromRGB(16,16,16);
+	ModeFrame.BackgroundColor3    = Color3.fromRGB(31,31,31);
 	ModeFrame.BorderSizePixel     = 0;
 	ModeFrame.Position            = UDim2.new(0,0,0,0);
 	ModeFrame.Size                = UDim2.new(0,74,1,0);
@@ -1647,33 +1659,44 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyFrame.Name                 = Fatality:RandomString();
 	KeyFrame.Parent               = BottomRow;
 	KeyFrame.AnchorPoint          = Vector2.new(1,0);
-	KeyFrame.BackgroundColor3     = Color3.fromRGB(16,16,16);
+	KeyFrame.BackgroundColor3     = Color3.fromRGB(22, 22, 22);
 	KeyFrame.BorderSizePixel      = 0;
 	KeyFrame.Position             = UDim2.new(1,0,0,0);
 	KeyFrame.Size                 = UDim2.new(0,34,1,0);
 	KeyFrame.ZIndex               = 152;
 
-	KeyFrameCorner.CornerRadius   = UDim.new(0,2);
+	KeyFrameCorner.CornerRadius   = UDim.new(0,4);
 	KeyFrameCorner.Parent         = KeyFrame;
 
+	KeyInner.Name                 = Fatality:RandomString();
+	KeyInner.Parent               = KeyFrame;
+	KeyInner.BackgroundColor3     = Color3.fromRGB(45, 45, 45);
+	KeyInner.BorderSizePixel      = 0;
+	KeyInner.Position             = UDim2.new(0,0,0,0);
+	KeyInner.Size                 = UDim2.new(1,0,1,-2);
+	KeyInner.ZIndex               = 153;
+
+	KeyInnerCorner.CornerRadius   = UDim.new(0,4);
+	KeyInnerCorner.Parent         = KeyInner;
+
 	KeyText.Name                  = Fatality:RandomString();
-	KeyText.Parent                = KeyFrame;
+	KeyText.Parent                = KeyInner;
 	KeyText.BackgroundTransparency= 1;
 	KeyText.BorderSizePixel       = 0;
 	KeyText.Size                  = UDim2.new(1,0,1,0);
-	KeyText.ZIndex                = 153;
+	KeyText.ZIndex                = 154;
 	KeyText.FontFace              = Fatality.FontSemiBold;
 	KeyText.Text                  = "None";
 	KeyText.TextColor3            = Color3.fromRGB(255,255,255);
 	KeyText.TextSize              = 10;
-	KeyText.TextTransparency      = 0.30;
+	KeyText.TextTransparency      = 0.0;
 
 	KeyClickBtn.Name              = Fatality:RandomString();
 	KeyClickBtn.Parent            = KeyFrame;
 	KeyClickBtn.BackgroundTransparency = 1;
 	KeyClickBtn.BorderSizePixel   = 0;
 	KeyClickBtn.Size              = UDim2.new(1,0,1,0);
-	KeyClickBtn.ZIndex            = 154;
+	KeyClickBtn.ZIndex            = 155;
 	KeyClickBtn.Text              = "";
 
 	-- ── gear sub-panel (slider only) ──────────────────────────────
@@ -6687,11 +6710,12 @@ function Fatality.new(Window: Window)
 
 			SectionName.Name = Fatality:RandomString()
 			SectionName.Parent = Section
+			table.insert(Fatality.SectionNameLabels, SectionName);
 			SectionName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, 10, 0, -12)
+			SectionName.Position = UDim2.new(0, 10, 0, (Fatality.SectionNameYOffset or -12))
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
