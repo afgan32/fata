@@ -384,6 +384,14 @@ end;
 function Fatality:SetDropdownPopupXOffset(x)
 	Fatality.DropdownPopupXOffset = x;
 end;
+
+function Fatality:SetKeybindPopupXOffset(x)
+	Fatality.KeybindPopupXOffset = x;
+end;
+
+function Fatality:SetKeybindPopupYOffset(y)
+	Fatality.KeybindPopupYOffset = y;
+end;
 Fatality.Version = '1.6';
 Fatality.Lucide = {
 	["lucide-accessibility"] = "rbxassetid://10709751939",
@@ -1845,8 +1853,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 		if bool then
 			IsOpen = true;
 			local h = getPopupH();
-			local px = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X;
-			local py = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y;
+			local px = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X + (Fatality.KeybindPopupXOffset or 0);
+			local py = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y + (Fatality.KeybindPopupYOffset or 0);
 			PopupFrame.Position = UDim2.fromOffset(px, py);
 			Fatality:CreateAnimation(PopupFrame, 0.45, { Size = UDim2.new(0,170,0,h) });
 			Fatality:CreateAnimation(PopupStroke,  0.45, { Transparency = 0 });
@@ -1854,8 +1862,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 			if SPAWN_THREAD then task.cancel(SPAWN_THREAD); SPAWN_THREAD = nil; end;
 			SPAWN_THREAD = task.spawn(function()
 				while true do task.wait(0.1);
-					local npx = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X;
-					local npy = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y;
+					local npx = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X + (Fatality.KeybindPopupXOffset or 0);
+					local npy = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y + (Fatality.KeybindPopupYOffset or 0);
 					Fatality:CreateAnimation(PopupFrame, 0.35, { Position = UDim2.fromOffset(npx,npy) });
 				end;
 			end);
