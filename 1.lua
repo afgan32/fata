@@ -679,4 +679,28 @@ do
 			Fatality:SetSectionNameYOffset(v)
 		end
 	})
+
+	Settings:AddSlider({
+		Name = "Section Name X Offset",
+		Default = 10,
+		Min = -20,
+		Max = 50,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetSectionNameXOffset(v)
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Dropdown Popup X Offset",
+		Default = 0,
+		Min = -50,
+		Max = 50,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetDropdownPopupXOffset(v)
+		end
+	})
 end
