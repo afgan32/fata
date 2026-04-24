@@ -367,9 +367,22 @@ function Fatality:SetSectionNameYOffset(y)
 	Fatality.SectionNameYOffset = y;
 	for _, label in ipairs(Fatality.SectionNameLabels) do
 		if typeof(label) == "Instance" and label.Parent then
-			label.Position = UDim2.new(0, 10, 0, y);
+			label.Position = UDim2.new(0, (Fatality.SectionNameXOffset or 10), 0, y);
 		end;
 	end;
+end;
+
+function Fatality:SetSectionNameXOffset(x)
+	Fatality.SectionNameXOffset = x;
+	for _, label in ipairs(Fatality.SectionNameLabels) do
+		if typeof(label) == "Instance" and label.Parent then
+			label.Position = UDim2.new(0, x, 0, (Fatality.SectionNameYOffset or -12));
+		end;
+	end;
+end;
+
+function Fatality:SetDropdownPopupXOffset(x)
+	Fatality.DropdownPopupXOffset = x;
 end;
 Fatality.Version = '1.6';
 Fatality.Lucide = {
@@ -1673,8 +1686,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyInner.Parent               = KeyFrame;
 	KeyInner.BackgroundColor3     = Color3.fromRGB(45, 45, 45);
 	KeyInner.BorderSizePixel      = 0;
-	KeyInner.Position             = UDim2.new(0,2,0,-1);
-	KeyInner.Size                 = UDim2.new(1,-4,1,-3);
+	KeyInner.Position             = UDim2.new(0,3,0,-1);
+	KeyInner.Size                 = UDim2.new(1,-6,1,-3);
 	KeyInner.ZIndex               = 153;
 
 	KeyInnerCorner.CornerRadius   = UDim.new(0,4);
@@ -1945,7 +1958,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	end);
 	Fatality:CreateHover(KeyFrame, function(b)
 		Fatality:CreateAnimation(KeyFrame, 0.20, {
-			BackgroundColor3 = b and Color3.fromRGB(26,26,26) or Color3.fromRGB(16,16,16);
+			BackgroundColor3 = b and Color3.fromRGB(26,26,26) or Color3.fromRGB(31,31,31);
 		});
 	end);
 
@@ -2918,7 +2931,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 				while true do task.wait()
 					local baseSize = UIListLayout.AbsoluteContentSize.Y + 10;
 
-					DropdownItemFrame.Position = UDim2.fromOffset(Parent.AbsolutePosition.X - Window.AbsolutePosition.X,Parent.AbsolutePosition.Y + Parent.AbsoluteSize.Y - Window.AbsolutePosition.Y)
+					DropdownItemFrame.Position = UDim2.fromOffset(Parent.AbsolutePosition.X - Window.AbsolutePosition.X + (Fatality.DropdownPopupXOffset or 0),Parent.AbsolutePosition.Y + Parent.AbsoluteSize.Y - Window.AbsolutePosition.Y)
 
 					Fatality:CreateAnimation(DropdownItemFrame,0.35,{
 						Size = UDim2.new(0, 145, 0, math.clamp(baseSize,0,250))
@@ -6722,7 +6735,7 @@ function Fatality.new(Window: Window)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, 10, 0, (Fatality.SectionNameYOffset or -12))
+			SectionName.Position = UDim2.new(0, (Fatality.SectionNameXOffset or 10), 0, (Fatality.SectionNameYOffset or -12))
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
