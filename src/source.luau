@@ -1405,8 +1405,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	local SPAWN_THREAD = nil;
 	local MLIST_THREAD = nil;
 
-	local POPUP_H_BASE = 58;
-	local POPUP_H_GEAR = 88;
+	local POPUP_H_BASE = 70;
+	local POPUP_H_GEAR = 102;
 
 	-- ── main popup ────────────────────────────────────────────────
 	local PopupFrame    = Instance.new("Frame");
@@ -1416,6 +1416,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 
 	-- ── top button ────────────────────────────────────────────────
 	local AddHotkeyBtn  = Instance.new("TextButton");
+	local AddHotkeyBtnCorner = Instance.new("UICorner");
 
 	-- ── divider ───────────────────────────────────────────────────
 	local Divider       = Instance.new("Frame");
@@ -1471,7 +1472,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	PopupFrame.ZIndex             = 150;
 	Fatality:AddDragBlacklist(PopupFrame);
 
-	PopupCorner.CornerRadius      = UDim.new(0, 3);
+	PopupCorner.CornerRadius      = UDim.new(0, 6);
 	PopupCorner.Parent            = PopupFrame;
 
 	PopupStroke.Color             = Color3.fromRGB(40, 40, 40);
@@ -1498,8 +1499,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	AddHotkeyBtn.Parent           = PopupFrame;
 	AddHotkeyBtn.BackgroundColor3 = Color3.fromRGB(31,31,31);
 	AddHotkeyBtn.BorderSizePixel  = 0;
-	AddHotkeyBtn.Position         = UDim2.new(0,0,0,0);
-	AddHotkeyBtn.Size             = UDim2.new(1,0,0,28);
+	AddHotkeyBtn.Position         = UDim2.new(0,8,0,8);
+	AddHotkeyBtn.Size             = UDim2.new(1,-16,0,24);
 	AddHotkeyBtn.ZIndex           = 151;
 	AddHotkeyBtn.FontFace         = Fatality.FontSemiBold;
 	AddHotkeyBtn.Text             = "Add hotkey";
@@ -1507,22 +1508,21 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	AddHotkeyBtn.TextSize         = 12;
 	AddHotkeyBtn.TextTransparency = 0.30;
 
+	AddHotkeyBtnCorner.CornerRadius = UDim.new(0, 4);
+	AddHotkeyBtnCorner.Parent       = AddHotkeyBtn;
+
 	-- ── divider ───────────────────────────────────────────────────
 	Divider.Name                  = Fatality:RandomString();
 	Divider.Parent                = PopupFrame;
-	Divider.BackgroundColor3      = Color3.fromRGB(40,40,40);
-	Divider.BorderSizePixel       = 0;
-	Divider.Position              = UDim2.new(0,8,0,28);
-	Divider.Size                  = UDim2.new(1,-16,0,1);
-	Divider.ZIndex                = 151;
+	Divider.Visible               = false;
 
 	-- ── bottom row ────────────────────────────────────────────────
 	BottomRow.Name                = Fatality:RandomString();
 	BottomRow.Parent              = PopupFrame;
 	BottomRow.BackgroundTransparency = 1;
 	BottomRow.BorderSizePixel     = 0;
-	BottomRow.Position            = UDim2.new(0,8,0,33);
-	BottomRow.Size                = UDim2.new(1,-16,0,20);
+	BottomRow.Position            = UDim2.new(0,8,0,38);
+	BottomRow.Size                = UDim2.new(1,-16,0,24);
 	BottomRow.ZIndex              = 151;
 
 	-- ── mode frame ────────────────────────────────────────────────
@@ -1531,7 +1531,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	ModeFrame.BackgroundColor3    = Color3.fromRGB(31,31,31);
 	ModeFrame.BorderSizePixel     = 0;
 	ModeFrame.Position            = UDim2.new(0,0,0,0);
-	ModeFrame.Size                = UDim2.new(0,74,1,0);
+	ModeFrame.Size                = UDim2.new(0,58,1,0);
 	ModeFrame.ZIndex              = 152;
 
 	ModeFrameCorner.CornerRadius  = UDim.new(0,2);
@@ -1583,7 +1583,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	ModeListFrame.BorderSizePixel = 0;
 	ModeListFrame.ClipsDescendants= true;
 	ModeListFrame.Position        = UDim2.new(4,0,4,0);
-	ModeListFrame.Size            = UDim2.new(0,80,0,0);
+	ModeListFrame.Size            = UDim2.new(0,58,0,0);
 	ModeListFrame.ZIndex          = 160;
 	Fatality:AddDragBlacklist(ModeListFrame);
 
@@ -1662,7 +1662,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyFrame.BackgroundColor3     = Color3.fromRGB(22, 22, 22);
 	KeyFrame.BorderSizePixel      = 0;
 	KeyFrame.Position             = UDim2.new(1,0,0,0);
-	KeyFrame.Size                 = UDim2.new(0,34,1,0);
+	KeyFrame.Size                 = UDim2.new(0,24,1,0);
 	KeyFrame.ZIndex               = 152;
 
 	KeyFrameCorner.CornerRadius   = UDim.new(0,4);
@@ -1704,7 +1704,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	GearDivider.Parent            = PopupFrame;
 	GearDivider.BackgroundColor3  = Color3.fromRGB(40,40,40);
 	GearDivider.BorderSizePixel   = 0;
-	GearDivider.Position          = UDim2.new(0,8,0,57);
+	GearDivider.Position          = UDim2.new(0,8,0,68);
 	GearDivider.Size              = UDim2.new(1,-16,0,1);
 	GearDivider.ZIndex            = 151;
 
@@ -1712,7 +1712,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	GearRow.Parent                = PopupFrame;
 	GearRow.BackgroundTransparency= 1;
 	GearRow.BorderSizePixel       = 0;
-	GearRow.Position              = UDim2.new(0,8,0,62);
+	GearRow.Position              = UDim2.new(0,8,0,73);
 	GearRow.Size                  = UDim2.new(1,-16,0,20);
 	GearRow.ZIndex                = 151;
 
@@ -1812,7 +1812,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 			local mx = ModeFrame.AbsolutePosition.X;
 			local my = ModeFrame.AbsolutePosition.Y + ModeFrame.AbsoluteSize.Y + 3;
 			ModeListFrame.Position = UDim2.fromOffset(mx, my);
-			Fatality:CreateAnimation(ModeListFrame, 0.30, { Size = UDim2.new(0,80,0,#Modes*18+8) });
+			Fatality:CreateAnimation(ModeListFrame, 0.30, { Size = UDim2.new(0,58,0,#Modes*18+8) });
 			Fatality:CreateAnimation(ModeListStroke, 0.30, { Transparency = 0 });
 			MLIST_THREAD = task.spawn(function()
 				while true do task.wait(0.05);
@@ -1822,7 +1822,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 				end;
 			end);
 		else
-			Fatality:CreateAnimation(ModeListFrame, 0.30, { Size = UDim2.new(0,80,0,0) });
+			Fatality:CreateAnimation(ModeListFrame, 0.30, { Size = UDim2.new(0,58,0,0) });
 			Fatality:CreateAnimation(ModeListStroke, 0.30, { Transparency = 1 });
 		end;
 	end;
