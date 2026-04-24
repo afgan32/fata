@@ -1672,8 +1672,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyInner.Parent               = KeyFrame;
 	KeyInner.BackgroundColor3     = Color3.fromRGB(45, 45, 45);
 	KeyInner.BorderSizePixel      = 0;
-	KeyInner.Position             = UDim2.new(0,0,0,0);
-	KeyInner.Size                 = UDim2.new(1,0,1,-2);
+	KeyInner.Position             = UDim2.new(0,2,0,1);
+	KeyInner.Size                 = UDim2.new(1,-4,1,-3);
 	KeyInner.ZIndex               = 153;
 
 	KeyInnerCorner.CornerRadius   = UDim.new(0,4);
@@ -1911,7 +1911,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 
 	Fatality:CreateHover(ModeFrame, function(b)
 		Fatality:CreateAnimation(ModeFrame, 0.20, {
-			BackgroundColor3 = b and Color3.fromRGB(26,26,26) or Color3.fromRGB(16,16,16);
+			BackgroundColor3 = b and Color3.fromRGB(26,26,26) or Color3.fromRGB(31,31,31);
 		});
 	end);
 
@@ -5233,6 +5233,9 @@ function Fatality.new(Window: Window)
 
 			for i,v in next , Fatal.Menus do
 				v.ValueSelect(false);
+				Fatality:CreateAnimation(v.Icon, 0.35, { ImageTransparency = 1 });
+				Fatality:CreateAnimation(v.menu_name, 0.35, { TextTransparency = 1, TextStrokeTransparency = 1 });
+				Fatality:CreateAnimation(v.MenuButton, 0.35, { BackgroundTransparency = 1 });
 			end;
 
 			Fatality:CreateAnimation(SaveButton,0.35,{
@@ -5998,6 +6001,9 @@ function Fatality.new(Window: Window)
 			Root = MenuLiber,
 			ValueSelect = ValueSelect,
 			Bindable = BindEvent,
+			Icon = Icon,
+			menu_name = menu_name,
+			MenuButton = MenuButton
 		};
 
 		if not Fatal.MenuSelected then
