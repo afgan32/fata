@@ -6816,9 +6816,18 @@ function Fatality.new(Window: Window)
 			local SCROLL_STEP = 40;
 			UserInputService.InputChanged:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseWheel then
+					-- skip if ctrl is held (ctrl+scroll is for sliders)
+					if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl) then
+						return;
+					end;
 					if Fatality:IsMouseOverFrame(Section) then
 						local maxY = Elements.AbsoluteCanvasSize.Y - Elements.AbsoluteSize.Y;
 						if maxY > 1 then
+							-- auto-close any open dropdown before scrolling
+							if Fatality.CurrentDropdown then
+								Fatality.CurrentDropdown();
+								Fatality.CurrentDropdown = nil;
+							end;
 							local newY = math.clamp(Elements.CanvasPosition.Y - input.Position.Z * SCROLL_STEP, 0, maxY);
 							Elements.CanvasPosition = Vector2.new(0, newY);
 						end;
@@ -6844,7 +6853,7 @@ function Fatality.new(Window: Window)
 
 			BindEvent.Event:Connect(Toggle);
 
-			return Fatality:CreateElements(Elements,Elements.ZIndex,BindEvent,{
+			local sectionResult = Fatality:CreateElements(Elements,Elements.ZIndex,BindEvent,{
 				Path = Menu.Name .. " > ".. Config.Name,
 				Memory = function(Name)
 					table.insert(Fatal.ElementContents,{
@@ -6854,6 +6863,156 @@ function Fatality.new(Window: Window)
 					});
 				end,
 			});
+			sectionResult._SectionFrame = Section;
+			return sectionResult;
+		end;
+		function MenuLib:AddSubTabs(tabNames)
+			-- sidebar width
+			local SIDEBAR_W = 70;
+
+			-- create sidebar container
+			local Sidebar = Instance.new("Frame");
+			Sidebar.Name = Fatality:RandomString();
+			Sidebar.Parent = MenuLiber;
+			Sidebar.BackgroundTransparency = 1;
+			Sidebar.BorderSizePixel = 0;
+			Sidebar.Position = UDim2.new(0, 5, 0, 5);
+			Sidebar.Size = UDim2.new(0, SIDEBAR_W, 1, -10);
+			Sidebar.ZIndex = 8;
+
+			local SidebarLayout = Instance.new("UIListLayout");
+			SidebarLayout.Parent = Sidebar;
+			SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder;
+			SidebarLayout.Padding = UDim.new(0, 2);
+
+			-- shift columns right to make room for sidebar
+			local shiftX = SIDEBAR_W + 10;
+			local colWidth = Left.Size.X.Scale;
+			local totalAvail = 1 - (shiftX / MenuLiber.AbsoluteSize.X);
+
+			Left.AnchorPoint = Vector2.new(0, 0.5);
+			Left.Position = UDim2.new(0, shiftX, 0.5, 0);
+			Left.Size = UDim2.new(0.32, 0, 1, -5);
+
+			Center.AnchorPoint = Vector2.new(0.5, 0.5);
+			Center.Position = UDim2.new(0, shiftX + (MenuLiber.AbsoluteSize.X - shiftX) * 0.5, 0.5, 0);
+			Center.Size = UDim2.new(0.32, 0, 1, -5);
+
+			Right.AnchorPoint = Vector2.new(1, 0.5);
+			Right.Position = UDim2.new(1, 0, 0.5, 0);
+			Right.Size = UDim2.new(0.32, 0, 1, -5);
+
+			-- track sub-tab state
+			local subTabSections = {}; -- tabName -> {section frames}
+			local subTabButtons = {};
+			local activeSubTab = nil;
+
+			local function selectSubTab(name)
+				activeSubTab = name;
+				-- show/hide sections
+				for tabName, sections in pairs(subTabSections) do
+					local vis = (tabName == name);
+					for _, sec in ipairs(sections) do
+						sec.Visible = vis;
+					end;
+				end;
+				-- update button visuals
+				for tabName, btn in pairs(subTabButtons) do
+					local isActive = (tabName == name);
+					btn.indicator.BackgroundTransparency = isActive and 0 or 1;
+					Fatality:CreateAnimation(btn.label, 0.2, {
+						TextTransparency = isActive and 0 or 0.5;
+					});
+				end;
+			end;
+
+			local result = {};
+
+			for i, tabName in ipairs(tabNames) do
+				subTabSections[tabName] = {};
+
+				-- create button row
+				local Btn = Instance.new("TextButton");
+				Btn.Name = Fatality:RandomString();
+				Btn.Parent = Sidebar;
+				Btn.BackgroundTransparency = 1;
+				Btn.BorderSizePixel = 0;
+				Btn.Size = UDim2.new(1, 0, 0, 22);
+				Btn.Text = "";
+				Btn.ZIndex = 9;
+				Btn.LayoutOrder = i;
+
+				-- active indicator bar (left side)
+				local Indicator = Instance.new("Frame");
+				Indicator.Name = Fatality:RandomString();
+				Indicator.Parent = Btn;
+				Indicator.BackgroundColor3 = Fatality.Colors.Main;
+				Indicator.BorderSizePixel = 0;
+				Indicator.Position = UDim2.new(0, 0, 0.15, 0);
+				Indicator.Size = UDim2.new(0, 2, 0.7, 0);
+				Indicator.ZIndex = 10;
+				Indicator.BackgroundTransparency = (i == 1) and 0 or 1;
+
+				local IndicatorCorner = Instance.new("UICorner");
+				IndicatorCorner.CornerRadius = UDim.new(0, 1);
+				IndicatorCorner.Parent = Indicator;
+
+				-- label
+				local Label = Instance.new("TextLabel");
+				Label.Name = Fatality:RandomString();
+				Label.Parent = Btn;
+				Label.BackgroundTransparency = 1;
+				Label.BorderSizePixel = 0;
+				Label.Position = UDim2.new(0, 8, 0, 0);
+				Label.Size = UDim2.new(1, -8, 1, 0);
+				Label.ZIndex = 10;
+				Label.FontFace = Fatality.FontSemiBold;
+				Label.Text = tabName;
+				Label.TextColor3 = Color3.fromRGB(255, 255, 255);
+				Label.TextSize = 12;
+				Label.TextXAlignment = Enum.TextXAlignment.Left;
+				Label.TextTransparency = (i == 1) and 0 or 0.5;
+
+				subTabButtons[tabName] = { btn = Btn, indicator = Indicator, label = Label };
+
+				Btn.MouseButton1Click:Connect(function()
+					selectSubTab(tabName);
+				end);
+
+				Fatality:CreateHover(Btn, function(b)
+					if activeSubTab ~= tabName then
+						Fatality:CreateAnimation(Label, 0.15, {
+							TextTransparency = b and 0.2 or 0.5;
+						});
+					end;
+				end);
+
+				-- create a sub-tab wrapper that overrides AddSection to tag sections
+				local subTab = {};
+				function subTab:AddSection(Config)
+					Config = Config or {};
+					local sectionElements = MenuLib:AddSection(Config);
+
+					-- use the _SectionFrame reference to show/hide
+					local secFrame = sectionElements._SectionFrame;
+					if secFrame then
+						table.insert(subTabSections[tabName], secFrame);
+						secFrame.Visible = (activeSubTab == tabName);
+					end;
+
+					return sectionElements;
+				end;
+
+				result[tabName] = subTab;
+			end;
+
+			-- select first tab by default
+			if #tabNames > 0 then
+				activeSubTab = tabNames[1];
+				selectSubTab(tabNames[1]);
+			end;
+
+			return result;
 		end;
 
 		return MenuLib;
