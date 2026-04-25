@@ -310,6 +310,8 @@ Fatality.SectionNameLabels    = {};
 Fatality.GlobalSliderWidth    = 82;
 Fatality.GlobalDropdownWidth  = 83;
 Fatality.GlobalDropdownHeight = 23;
+Fatality.CheckboxFrames       = {};
+Fatality.OptionIconFrames     = {};
 
 function Fatality:SetGlobalSliderWidth(w)
 	Fatality.GlobalSliderWidth = w;
@@ -398,6 +400,24 @@ function Fatality:SetSectionNameTextSize(s)
 	for _, label in ipairs(Fatality.SectionNameLabels) do
 		if typeof(label) == "Instance" and label.Parent then
 			label.TextSize = s;
+		end;
+	end;
+end;
+
+function Fatality:SetCheckboxScale(s)
+	Fatality.CheckboxScale = s;
+	for _, f in ipairs(Fatality.CheckboxFrames) do
+		if typeof(f) == "Instance" and f.Parent then
+			f.Size = UDim2.new(s, 0, s, 0);
+		end;
+	end;
+end;
+
+function Fatality:SetOptionIconScale(s)
+	Fatality.OptionIconScale = s;
+	for _, f in ipairs(Fatality.OptionIconFrames) do
+		if typeof(f) == "Instance" and f.Parent then
+			f.Size = UDim2.new(s, 0, s, 0);
 		end;
 	end;
 end;
@@ -3258,11 +3278,12 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
-		ValueFrame.Size = UDim2.new(0.75, 0, 0.75, 0)
+		ValueFrame.Size = UDim2.new(Fatality.CheckboxScale or 0.75, 0, Fatality.CheckboxScale or 0.75, 0)
 		ValueFrame.SizeConstraint = Enum.SizeConstraint.RelativeYY
 		ValueFrame.ZIndex = ZIndex + 2
 		ValueFrame.BackgroundTransparency = 1;
 		ValueFrame:SetAttribute("_hotkey_zone", true);
+		table.insert(Fatality.CheckboxFrames, ValueFrame);
 
 		UICorner.CornerRadius = UDim.new(0, 2)
 		UICorner.Parent = ValueFrame
@@ -3288,12 +3309,13 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		OptionButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		OptionButton.BorderSizePixel = 0
 		OptionButton.Position = UDim2.new(1, -25, 0.5, 0)
-		OptionButton.Size = UDim2.new(0.7, 0, 0.7, 0)
+		OptionButton.Size = UDim2.new(Fatality.OptionIconScale or 0.7, 0, Fatality.OptionIconScale or 0.7, 0)
 		OptionButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
 		OptionButton.Image = "http://www.roblox.com/asset/?id=14007344336"
 		OptionButton.ImageTransparency = 1
 		OptionButton.ZIndex = ZIndex + 4
 		OptionButton.Visible = Config.Option;
+		table.insert(Fatality.OptionIconFrames, OptionButton);
 
 		local toggleImg = function(value)
 			if value then
@@ -5946,7 +5968,7 @@ function Fatality.new(Window: Window)
 			Right.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
 
 			-- manual scroll wheel: child sections block native ScrollingFrame scroll
-			local SCROLL_STEP = 30;
+			local SCROLL_STEP = 40;
 			local function scrollColumn(col, direction)
 				local maxY = math.max(0, col.AbsoluteCanvasSize.Y - col.AbsoluteSize.Y);
 				local newY = math.clamp(col.CanvasPosition.Y - direction * SCROLL_STEP, 0, maxY);
@@ -5955,15 +5977,17 @@ function Fatality.new(Window: Window)
 
 			UserInputService.InputChanged:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseWheel then
-					local mousePos = UserInputService:GetMouseLocation();
-					local cols = {Left, Center, Right};
-					for _, col in ipairs(cols) do
-						local pos = col.AbsolutePosition;
-						local sz  = col.AbsoluteSize;
-						if mousePos.X >= pos.X and mousePos.X <= pos.X + sz.X
-						   and mousePos.Y >= pos.Y and mousePos.Y <= pos.Y + sz.Y then
+					if MenuLiber.Visible and Fatality:IsMouseOverFrame(MenuLiber) then
+						local cols = {Left, Center, Right};
+						for _, col in ipairs(cols) do
+							if Fatality:IsMouseOverFrame(col) then
+								scrollColumn(col, input.Position.Z);
+								return;
+							end;
+						end;
+						-- fallback: scroll all columns together
+						for _, col in ipairs(cols) do
 							scrollColumn(col, input.Position.Z);
-							break;
 						end;
 					end;
 				end;
