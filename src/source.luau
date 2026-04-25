@@ -392,6 +392,15 @@ end;
 function Fatality:SetKeybindPopupYOffset(y)
 	Fatality.KeybindPopupYOffset = y;
 end;
+
+function Fatality:SetSectionNameTextSize(s)
+	Fatality.SectionNameTextSize = s;
+	for _, label in ipairs(Fatality.SectionNameLabels) do
+		if typeof(label) == "Instance" and label.Parent then
+			label.TextSize = s;
+		end;
+	end;
+end;
 Fatality.Version = '1.6';
 Fatality.Lucide = {
 	["lucide-accessibility"] = "rbxassetid://10709751939",
@@ -1496,7 +1505,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	PopupCorner.CornerRadius      = UDim.new(0, 6);
 	PopupCorner.Parent            = PopupFrame;
 
-	PopupStroke.Color             = Color3.fromRGB(40, 40, 40);
+	PopupStroke.Color             = Color3.fromRGB(40, 40, 39);
+	PopupStroke.Thickness         = 1;
 	PopupStroke.Transparency      = 1;
 	PopupStroke.Parent            = PopupFrame;
 
@@ -3219,7 +3229,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		Toggle.BackgroundTransparency = 1.000
 		Toggle.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Toggle.BorderSizePixel = 0
-		Toggle.Size = UDim2.new(1, -25, 0, 17)
+		Toggle.Size = UDim2.new(1, -25, 0, 15)
 		Toggle.ZIndex = ZIndex + 1
 		Fatality:AddDragBlacklist(Toggle);
 
@@ -3248,7 +3258,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		ValueFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		ValueFrame.BorderSizePixel = 0
 		ValueFrame.Position = UDim2.new(1, -3, 0.5, 0)
-		ValueFrame.Size = UDim2.new(0.899999976, 0, 0.899999976, 0)
+		ValueFrame.Size = UDim2.new(0.75, 0, 0.75, 0)
 		ValueFrame.SizeConstraint = Enum.SizeConstraint.RelativeYY
 		ValueFrame.ZIndex = ZIndex + 2
 		ValueFrame.BackgroundTransparency = 1;
@@ -3278,7 +3288,7 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		OptionButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		OptionButton.BorderSizePixel = 0
 		OptionButton.Position = UDim2.new(1, -25, 0.5, 0)
-		OptionButton.Size = UDim2.new(0.899999976, 0, 0.899999976, 0)
+		OptionButton.Size = UDim2.new(0.7, 0, 0.7, 0)
 		OptionButton.SizeConstraint = Enum.SizeConstraint.RelativeYY
 		OptionButton.Image = "http://www.roblox.com/asset/?id=14007344336"
 		OptionButton.ImageTransparency = 1
@@ -6748,10 +6758,11 @@ function Fatality.new(Window: Window)
 			Section.ClipsDescendants = false
 			Section.Size = UDim2.new(1, 0, 0, 0)
 
-			SectionCorner.CornerRadius = UDim.new(0, 3)
+			SectionCorner.CornerRadius = UDim.new(0, 5)
 			SectionCorner.Parent = Section
 
-			SectionStroke.Color = Color3.fromRGB(41, 41, 41)
+			SectionStroke.Color = Color3.fromRGB(40, 40, 39)
+			SectionStroke.Thickness = 1;
 			SectionStroke.Parent = Section
 
 			Elements.Name = Fatality:RandomString()
@@ -6764,7 +6775,7 @@ function Fatality.new(Window: Window)
 			Elements.Position = UDim2.new(0.5, 0, 1, -1)
 			Elements.Size = UDim2.new(1, -5, 1, -10)
 
-			UICorner.CornerRadius = UDim.new(0, 2)
+			UICorner.CornerRadius = UDim.new(0, 5)
 			UICorner.Parent = Elements
 
 			UIListLayout.Parent = Elements
@@ -6792,7 +6803,7 @@ function Fatality.new(Window: Window)
 			SectionName.FontFace = Fatality.FontSemiBold;
 			SectionName.Text = Config.Name
 			SectionName.TextColor3 = Color3.fromRGB(255, 255, 255)
-			SectionName.TextSize = 12.000
+			SectionName.TextSize = (Fatality.SectionNameTextSize or 12)
 			SectionName.TextStrokeTransparency = 0.750
 			SectionName.TextXAlignment = Enum.TextXAlignment.Left
 
