@@ -421,6 +421,15 @@ function Fatality:SetOptionIconScale(s)
 		end;
 	end;
 end;
+
+function Fatality:SetSubTabWidth(w)
+	Fatality.SubTabWidth = w;
+	if Fatality._SubTabReposition then
+		for _, repoFunc in ipairs(Fatality._SubTabReposition) do
+			repoFunc(w);
+		end;
+	end;
+end;
 Fatality.Version = '1.6';
 Fatality.Lucide = {
 	["lucide-accessibility"] = "rbxassetid://10709751939",
@@ -6867,8 +6876,8 @@ function Fatality.new(Window: Window)
 			return sectionResult;
 		end;
 		function MenuLib:AddSubTabs(tabNames)
-			-- sidebar width
-			local SIDEBAR_W = 70;
+			-- sidebar width (configurable)
+			local SIDEBAR_W = Fatality.SubTabWidth or 70;
 
 			-- create sidebar container
 			local Sidebar = Instance.new("Frame");
@@ -6885,22 +6894,36 @@ function Fatality.new(Window: Window)
 			SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder;
 			SidebarLayout.Padding = UDim.new(0, 2);
 
-			-- shift columns right to make room for sidebar
-			local shiftX = SIDEBAR_W + 10;
-			local colWidth = Left.Size.X.Scale;
-			local totalAvail = 1 - (shiftX / MenuLiber.AbsoluteSize.X);
+			-- function to reposition columns based on sidebar width
+			local function repositionColumns(w)
+				SIDEBAR_W = w;
+				Sidebar.Size = UDim2.new(0, w, 1, -10);
+				
+				-- tightly pack columns in the remaining space
+				local shiftX = w + 10;
+				local safeMargin = 15; -- total safe margin on right
+				local availPixels = MenuLiber.AbsoluteSize.X - shiftX - safeMargin;
+				local gapPixels = 10; -- 10px gap between columns
+				local colPixels = math.max(1, (availPixels - gapPixels * 2) / 3);
+				
+				Left.AnchorPoint = Vector2.new(0, 0.5);
+				Left.Position = UDim2.new(0, shiftX, 0.5, 0);
+				Left.Size = UDim2.new(0, colPixels, 1, -5);
 
-			Left.AnchorPoint = Vector2.new(0, 0.5);
-			Left.Position = UDim2.new(0, shiftX, 0.5, 0);
-			Left.Size = UDim2.new(0.32, 0, 1, -5);
+				Center.AnchorPoint = Vector2.new(0, 0.5);
+				Center.Position = UDim2.new(0, shiftX + colPixels + gapPixels, 0.5, 0);
+				Center.Size = UDim2.new(0, colPixels, 1, -5);
 
-			Center.AnchorPoint = Vector2.new(0.5, 0.5);
-			Center.Position = UDim2.new(0, shiftX + (MenuLiber.AbsoluteSize.X - shiftX) * 0.5, 0.5, 0);
-			Center.Size = UDim2.new(0.32, 0, 1, -5);
+				Right.AnchorPoint = Vector2.new(0, 0.5);
+				Right.Position = UDim2.new(0, shiftX + (colPixels * 2) + (gapPixels * 2), 0.5, 0);
+				Right.Size = UDim2.new(0, colPixels, 1, -5);
+			end;
 
-			Right.AnchorPoint = Vector2.new(1, 0.5);
-			Right.Position = UDim2.new(1, 0, 0.5, 0);
-			Right.Size = UDim2.new(0.32, 0, 1, -5);
+			repositionColumns(SIDEBAR_W);
+
+			-- store the reposition function for external access
+			if not Fatality._SubTabReposition then Fatality._SubTabReposition = {}; end;
+			table.insert(Fatality._SubTabReposition, repositionColumns);
 
 			-- track sub-tab state
 			local subTabSections = {}; -- tabName -> {section frames}
