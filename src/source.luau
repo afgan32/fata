@@ -426,7 +426,16 @@ function Fatality:SetSubTabWidth(w)
 	Fatality.SubTabWidth = w;
 	if Fatality._SubTabReposition then
 		for _, repoFunc in ipairs(Fatality._SubTabReposition) do
-			repoFunc(w);
+			repoFunc();
+		end;
+	end;
+end;
+
+function Fatality:SetSubTabColumnWidth(s)
+	Fatality.SubTabColumnWidth = s;
+	if Fatality._SubTabReposition then
+		for _, repoFunc in ipairs(Fatality._SubTabReposition) do
+			repoFunc();
 		end;
 	end;
 end;
@@ -6921,32 +6930,34 @@ function Fatality.new(Window: Window)
 			SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder;
 			SidebarLayout.Padding = UDim.new(0, 2);
 
-			-- function to reposition columns based on sidebar width
-			local function repositionColumns(w)
-				SIDEBAR_W = w;
+			-- block sub-tab columns from overlapping global SectionColumnWidth slider loops
+			local function repositionColumns()
+				local w = Fatality.SubTabWidth or 70;
 				Sidebar.Size = UDim2.new(0, w, 1, -10);
 				
-				-- tightly pack columns in the remaining space
 				local shiftX = w + 10;
-				local safeMargin = 15; -- total safe margin on right
-				local availPixels = MenuLiber.AbsoluteSize.X - shiftX - safeMargin;
-				local gapPixels = 10; -- 10px gap between columns
-				local colPixels = math.max(1, (availPixels - gapPixels * 2) / 3);
+				local safeMargin = 15;
+				local gapPixels = 10;
+				local K = shiftX + safeMargin + (gapPixels * 2);
+				
+				-- If user sets custom column width for subtabs, use it, otherwise default to taking 1/3 of the space proportionally
+				local subScale = Fatality.SubTabColumnWidth or (1 / 3);
+				local subOffset = Fatality.SubTabColumnWidth and 0 or (-K / 3);
 				
 				Left.AnchorPoint = Vector2.new(0, 0.5);
 				Left.Position = UDim2.new(0, shiftX, 0.5, 0);
-				Left.Size = UDim2.new(0, colPixels, 1, -5);
+				Left.Size = UDim2.new(subScale, subOffset, 1, -5);
 
 				Center.AnchorPoint = Vector2.new(0, 0.5);
-				Center.Position = UDim2.new(0, shiftX + colPixels + gapPixels, 0.5, 0);
-				Center.Size = UDim2.new(0, colPixels, 1, -5);
+				Center.Position = UDim2.new(subScale, shiftX + subOffset + gapPixels, 0.5, 0);
+				Center.Size = UDim2.new(subScale, subOffset, 1, -5);
 
 				Right.AnchorPoint = Vector2.new(0, 0.5);
-				Right.Position = UDim2.new(0, shiftX + (colPixels * 2) + (gapPixels * 2), 0.5, 0);
-				Right.Size = UDim2.new(0, colPixels, 1, -5);
+				Right.Position = UDim2.new(subScale * 2, shiftX + (subOffset * 2) + (gapPixels * 2), 0.5, 0);
+				Right.Size = UDim2.new(subScale, subOffset, 1, -5);
 			end;
 
-			repositionColumns(SIDEBAR_W);
+			repositionColumns();
 
 			-- store the reposition function for external access
 			if not Fatality._SubTabReposition then Fatality._SubTabReposition = {}; end;
