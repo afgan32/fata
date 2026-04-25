@@ -6775,6 +6775,7 @@ function Fatality.new(Window: Window)
 			Elements.Position = UDim2.new(0.5, 0, 1, -1)
 			Elements.Size = UDim2.new(1, -5, 1, -10)
 			Elements.ScrollBarThickness = 0
+			Elements.ScrollBarImageTransparency = 1
 			Elements.AutomaticCanvasSize = Enum.AutomaticSize.Y
 			Elements.ClipsDescendants = true
 			Elements.ScrollingDirection = Enum.ScrollingDirection.Y
@@ -6811,14 +6812,16 @@ function Fatality.new(Window: Window)
 			SectionName.TextStrokeTransparency = 0.750
 			SectionName.TextXAlignment = Enum.TextXAlignment.Left
 
-			-- manual scroll wheel for this section
+			-- manual scroll wheel for this section (only when content overflows)
 			local SCROLL_STEP = 40;
 			UserInputService.InputChanged:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseWheel then
 					if Fatality:IsMouseOverFrame(Section) then
-						local maxY = math.max(0, Elements.AbsoluteCanvasSize.Y - Elements.AbsoluteSize.Y);
-						local newY = math.clamp(Elements.CanvasPosition.Y - input.Position.Z * SCROLL_STEP, 0, maxY);
-						Elements.CanvasPosition = Vector2.new(0, newY);
+						local maxY = Elements.AbsoluteCanvasSize.Y - Elements.AbsoluteSize.Y;
+						if maxY > 1 then
+							local newY = math.clamp(Elements.CanvasPosition.Y - input.Position.Z * SCROLL_STEP, 0, maxY);
+							Elements.CanvasPosition = Vector2.new(0, newY);
+						end;
 					end;
 				end;
 			end);
