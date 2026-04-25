@@ -5864,7 +5864,7 @@ function Fatality.new(Window: Window)
 		Left.BackgroundTransparency = 1.000
 		Left.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Left.BorderSizePixel = 0
-		Left.ClipsDescendants = false
+		Left.ClipsDescendants = true
 		Left.Position = UDim2.new(0.175, 0, 0.5, 0)
 		Left.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Left.ScrollBarThickness = 0
@@ -5887,7 +5887,7 @@ function Fatality.new(Window: Window)
 		Center.BackgroundTransparency = 1.000
 		Center.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Center.BorderSizePixel = 0
-		Center.ClipsDescendants = false
+		Center.ClipsDescendants = true
 		Center.Position = UDim2.new(0.5, 0, 0.5, 0)
 		Center.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Center.ScrollBarThickness = 0
@@ -5910,7 +5910,7 @@ function Fatality.new(Window: Window)
 		Right.BackgroundTransparency = 1.000
 		Right.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Right.BorderSizePixel = 0
-		Right.ClipsDescendants = false
+		Right.ClipsDescendants = true
 		Right.Position = UDim2.new(0.825, 0, 0.5, 0)
 		Right.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Right.ScrollBarThickness = 0
