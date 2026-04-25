@@ -5966,32 +5966,6 @@ function Fatality.new(Window: Window)
 			Left.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
 			Center.AutomaticCanvasSize = Enum.AutomaticSize.Y;
 			Right.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
-
-			-- manual scroll wheel: child sections block native ScrollingFrame scroll
-			local SCROLL_STEP = 40;
-			local function scrollColumn(col, direction)
-				local maxY = math.max(0, col.AbsoluteCanvasSize.Y - col.AbsoluteSize.Y);
-				local newY = math.clamp(col.CanvasPosition.Y - direction * SCROLL_STEP, 0, maxY);
-				col.CanvasPosition = Vector2.new(0, newY);
-			end;
-
-			UserInputService.InputChanged:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseWheel then
-					if MenuLiber.Visible and Fatality:IsMouseOverFrame(MenuLiber) then
-						local cols = {Left, Center, Right};
-						for _, col in ipairs(cols) do
-							if Fatality:IsMouseOverFrame(col) then
-								scrollColumn(col, input.Position.Z);
-								return;
-							end;
-						end;
-						-- fallback: scroll all columns together
-						for _, col in ipairs(cols) do
-							scrollColumn(col, input.Position.Z);
-						end;
-					end;
-				end;
-			end);
 		else
 			Right.CanvasSize = UDim2.new(0,0,0,0);
 			Left.CanvasSize = UDim2.new(0,0,0,0);
@@ -6744,7 +6718,7 @@ function Fatality.new(Window: Window)
 			});
 
 			local Section = Instance.new("Frame")
-			local Elements = Instance.new("Frame")
+			local Elements = Instance.new("ScrollingFrame")
 			local UICorner = Instance.new("UICorner")
 			local SectionCorner = Instance.new("UICorner")
 			local SectionStroke = Instance.new("UIStroke")
@@ -6774,8 +6748,10 @@ function Fatality.new(Window: Window)
 				end
 			end;
 
+			local ParentColumn = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
+
 			Section.Name = Fatality:RandomString()
-			Section.Parent = (string.lower(Config.Position) == 'left' and Left) or (string.lower(Config.Position) == 'center' and Center) or Right;
+			Section.Parent = ParentColumn;
 			Section.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 			Section.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			Section.BorderSizePixel = 0
@@ -6798,6 +6774,10 @@ function Fatality.new(Window: Window)
 			Elements.BorderSizePixel = 0
 			Elements.Position = UDim2.new(0.5, 0, 1, -1)
 			Elements.Size = UDim2.new(1, -5, 1, -10)
+			Elements.ScrollBarThickness = 0
+			Elements.AutomaticCanvasSize = Enum.AutomaticSize.Y
+			Elements.ClipsDescendants = true
+			Elements.ScrollingDirection = Enum.ScrollingDirection.Y
 
 			UICorner.CornerRadius = UDim.new(0, 5)
 			UICorner.Parent = Elements
@@ -6831,13 +6811,26 @@ function Fatality.new(Window: Window)
 			SectionName.TextStrokeTransparency = 0.750
 			SectionName.TextXAlignment = Enum.TextXAlignment.Left
 
+			-- manual scroll wheel for this section
+			local SCROLL_STEP = 40;
+			UserInputService.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseWheel then
+					if Fatality:IsMouseOverFrame(Section) then
+						local maxY = math.max(0, Elements.AbsoluteCanvasSize.Y - Elements.AbsoluteSize.Y);
+						local newY = math.clamp(Elements.CanvasPosition.Y - input.Position.Z * SCROLL_STEP, 0, maxY);
+						Elements.CanvasPosition = Vector2.new(0, newY);
+					end;
+				end;
+			end);
 
 			UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
 				local MainScale = UIListLayout.AbsoluteContentSize.Y + 30 + Config.Height;
+				local maxH = ParentColumn.AbsoluteSize.Y - 15;
 
 				if not Menu.AutoFill then
+					local clampedH = math.min(MainScale, maxH);
 					Fatality:CreateAnimation(Section,0.25,{
-						Size = UDim2.new(1, 0, 0, MainScale)
+						Size = UDim2.new(1, 0, 0, clampedH)
 					})
 				else
 					Section.Size = UDim2.new(1,0,0,MainScale / 2.5);
