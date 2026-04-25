@@ -430,6 +430,17 @@ function Fatality:SetSubTabWidth(w)
 		end;
 	end;
 end;
+
+function Fatality:SetSectionPadding(p)
+	Fatality.SectionPadding = p;
+	if Fatality.SectionColumnFrames then
+		for _, cols in ipairs(Fatality.SectionColumnFrames) do
+			if cols.L:FindFirstChildWhichIsA("UIListLayout") then cols.L:FindFirstChildWhichIsA("UIListLayout").Padding = UDim.new(0, p) end;
+			if cols.C:FindFirstChildWhichIsA("UIListLayout") then cols.C:FindFirstChildWhichIsA("UIListLayout").Padding = UDim.new(0, p) end;
+			if cols.R:FindFirstChildWhichIsA("UIListLayout") then cols.R:FindFirstChildWhichIsA("UIListLayout").Padding = UDim.new(0, p) end;
+		end;
+	end;
+end;
 Fatality.Version = '1.6';
 Fatality.Lucide = {
 	["lucide-accessibility"] = "rbxassetid://10709751939",
@@ -5451,12 +5462,19 @@ function Fatality.new(Window: Window)
 	HeaderLine.Name = Fatality:RandomString()
 	HeaderLine.Parent = Header
 	HeaderLine.AnchorPoint = Vector2.new(0, 1)
-	HeaderLine.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+	HeaderLine.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
 	HeaderLine.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLine.BorderSizePixel = 0
 	HeaderLine.Position = UDim2.new(0, 0, 1, 0)
-	HeaderLine.Size = UDim2.new(1, 0, 0, 1)
-	HeaderLine.ZIndex = 3
+	HeaderLine.Size = UDim2.new(1, 0, 0, 6)
+	HeaderLine.ZIndex = 8
+
+	local HLGlow = Instance.new("UIGradient", HeaderLine)
+	HLGlow.Rotation = 90
+	HLGlow.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
 
 	UICorner_2.CornerRadius = UDim.new(0, 5)
 	UICorner_2.Parent = Header
@@ -5613,11 +5631,20 @@ function Fatality.new(Window: Window)
 
 	HeaderLine_2.Name = Fatality:RandomString()
 	HeaderLine_2.Parent = Bottom
-	HeaderLine_2.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
+	HeaderLine_2.AnchorPoint = Vector2.new(0, 1)
+	HeaderLine_2.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
 	HeaderLine_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLine_2.BorderSizePixel = 0
-	HeaderLine_2.Size = UDim2.new(1, 0, 0, 1)
-	HeaderLine_2.ZIndex = 3
+	HeaderLine_2.Position = UDim2.new(0, 0, 0, 0)
+	HeaderLine_2.Size = UDim2.new(1, 0, 0, 6)
+	HeaderLine_2.ZIndex = 8
+
+	local HLGlow2 = Instance.new("UIGradient", HeaderLine_2)
+	HLGlow2.Rotation = -90
+	HLGlow2.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
 
 	UICorner_5.CornerRadius = UDim.new(0, 4)
 	UICorner_5.Parent = Bottom
@@ -5917,7 +5944,7 @@ function Fatality.new(Window: Window)
 		UIListLayout.Parent = Left
 		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		UIListLayout.Padding = UDim.new(0, 8)
+		UIListLayout.Padding = UDim.new(0, (Fatality.SectionPadding or 8))
 		UIListLayout.VerticalFlex = (Menu.AutoFill and Enum.UIFlexAlignment.Fill) or Enum.UIFlexAlignment.None;
 
 		Center.Name = Fatality:RandomString()
@@ -5940,7 +5967,7 @@ function Fatality.new(Window: Window)
 		UIListLayout_2.Parent = Center
 		UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
 		UIListLayout_2.SortOrder = Enum.SortOrder.LayoutOrder
-		UIListLayout_2.Padding = UDim.new(0, 8)
+		UIListLayout_2.Padding = UDim.new(0, (Fatality.SectionPadding or 8))
 		UIListLayout_2.VerticalFlex = (Menu.AutoFill and Enum.UIFlexAlignment.Fill) or Enum.UIFlexAlignment.None;
 
 		Right.Name = Fatality:RandomString()
@@ -5963,7 +5990,7 @@ function Fatality.new(Window: Window)
 		UIListLayout_3.Parent = Right
 		UIListLayout_3.HorizontalAlignment = Enum.HorizontalAlignment.Center
 		UIListLayout_3.SortOrder = Enum.SortOrder.LayoutOrder
-		UIListLayout_3.Padding = UDim.new(0, 8)
+		UIListLayout_3.Padding = UDim.new(0, (Fatality.SectionPadding or 8))
 		UIListLayout_3.VerticalFlex = (Menu.AutoFill and Enum.UIFlexAlignment.Fill) or Enum.UIFlexAlignment.None;
 
 		table.insert(Fatality.SectionColumnFrames, { L = Left, C = Center, R = Right });
