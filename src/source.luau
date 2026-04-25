@@ -5931,9 +5931,9 @@ function Fatality.new(Window: Window)
 		BindEvent.Name = Fatality:RandomString();
 
 		if not Menu.AutoFill then
-			Fatality:ScrollSignal(Right,UIListLayout_3,'Y');
-			Fatality:ScrollSignal(Center,UIListLayout_2,'Y');
-			Fatality:ScrollSignal(Left,UIListLayout,'Y');
+			Left.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
+			Center.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+			Right.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
 		else
 			Right.CanvasSize = UDim2.new(0,0,0,0);
 			Left.CanvasSize = UDim2.new(0,0,0,0);
