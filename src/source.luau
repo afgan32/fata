@@ -1935,6 +1935,9 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 			end);
 		else
 			IsOpen = false;
+			if Fatality.CurrentKeybindClose == TogglePopup then
+				Fatality.CurrentKeybindClose = nil;
+			end;
 			if SPAWN_THREAD then task.cancel(SPAWN_THREAD); SPAWN_THREAD = nil; end;
 			toggleModeList(false);
 			Fatality:CreateAnimation(PopupFrame, 0.45, { Size = UDim2.new(0,170,0,0) });
@@ -3816,7 +3819,11 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 			Fatality.WindowFlags[FatalWindow][Config.Flag.."Slider"] = Respons;
 		end;
 
-		Config.Callback(Config.Default);
+		task.defer(function()
+			if Config.Callback then
+				Config.Callback(Config.Default);
+			end;
+		end);
 
 		return Respons;
 	end;
@@ -5476,6 +5483,7 @@ function Fatality.new(Window: Window)
 	HeaderLine.BorderSizePixel = 0
 	HeaderLine.Position = UDim2.new(0, 0, 1, 0)
 	HeaderLine.Size = UDim2.new(1, 0, 0, 6)
+	HeaderLine.Visible = false
 	HeaderLine.ZIndex = 8
 
 	local HLGlow = Instance.new("UIGradient", HeaderLine)
@@ -5610,6 +5618,7 @@ function Fatality.new(Window: Window)
 	HeaderLineShadow.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLineShadow.BorderSizePixel = 0
 	HeaderLineShadow.Size = UDim2.new(1, 0, 1, 10)
+	HeaderLineShadow.Visible = false
 
 	UIGradient.Rotation = 90
 	UIGradient.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00)}
@@ -5647,6 +5656,7 @@ function Fatality.new(Window: Window)
 	HeaderLine_2.Position = UDim2.new(0, 0, 0, 0)
 	HeaderLine_2.Size = UDim2.new(1, 0, 0, 6)
 	HeaderLine_2.ZIndex = 8
+	HeaderLine_2.Visible = false
 
 	local HLGlow2 = Instance.new("UIGradient", HeaderLine_2)
 	HLGlow2.Rotation = -90
@@ -5667,6 +5677,7 @@ function Fatality.new(Window: Window)
 	HeaderLineShadow_2.BorderSizePixel = 0
 	HeaderLineShadow_2.Position = UDim2.new(0, 0, 1, 0)
 	HeaderLineShadow_2.Size = UDim2.new(1, 0, 1, 5)
+	HeaderLineShadow_2.Visible = false
 
 	UIGradient_2.Rotation = -90
 	UIGradient_2.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 0.00), NumberSequenceKeypoint.new(1.00, 1.00)}
@@ -6868,10 +6879,14 @@ function Fatality.new(Window: Window)
 					if Fatality:IsMouseOverFrame(Section) then
 						local maxY = Elements.AbsoluteCanvasSize.Y - Elements.AbsoluteSize.Y;
 						if maxY > 1 then
-							-- auto-close any open dropdown before scrolling
+							-- auto-close any open dropdown and keybind popups before scrolling
 							if Fatality.CurrentDropdown then
 								Fatality.CurrentDropdown();
 								Fatality.CurrentDropdown = nil;
+							end;
+							if Fatality.CurrentKeybindClose then
+								Fatality.CurrentKeybindClose(false);
+								Fatality.CurrentKeybindClose = nil;
 							end;
 							local newY = math.clamp(Elements.CanvasPosition.Y - input.Position.Z * SCROLL_STEP, 0, maxY);
 							Elements.CanvasPosition = Vector2.new(0, newY);
