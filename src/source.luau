@@ -5934,6 +5934,30 @@ function Fatality.new(Window: Window)
 			Left.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
 			Center.AutomaticCanvasSize = Enum.AutomaticSize.Y;
 			Right.AutomaticCanvasSize  = Enum.AutomaticSize.Y;
+
+			-- manual scroll wheel: child sections block native ScrollingFrame scroll
+			local SCROLL_STEP = 30;
+			local function scrollColumn(col, direction)
+				local maxY = math.max(0, col.AbsoluteCanvasSize.Y - col.AbsoluteSize.Y);
+				local newY = math.clamp(col.CanvasPosition.Y - direction * SCROLL_STEP, 0, maxY);
+				col.CanvasPosition = Vector2.new(0, newY);
+			end;
+
+			UserInputService.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseWheel then
+					local mousePos = UserInputService:GetMouseLocation();
+					local cols = {Left, Center, Right};
+					for _, col in ipairs(cols) do
+						local pos = col.AbsolutePosition;
+						local sz  = col.AbsoluteSize;
+						if mousePos.X >= pos.X and mousePos.X <= pos.X + sz.X
+						   and mousePos.Y >= pos.Y and mousePos.Y <= pos.Y + sz.Y then
+							scrollColumn(col, input.Position.Z);
+							break;
+						end;
+					end;
+				end;
+			end);
 		else
 			Right.CanvasSize = UDim2.new(0,0,0,0);
 			Left.CanvasSize = UDim2.new(0,0,0,0);
