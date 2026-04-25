@@ -1601,7 +1601,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	ModeListFrame.Name            = Fatality:RandomString();
 	ModeListFrame.Parent          = OwnWindow;
 	ModeListFrame.AnchorPoint     = Vector2.new(0,0);
-	ModeListFrame.BackgroundColor3= Color3.fromRGB(19,19,19);
+	ModeListFrame.BackgroundColor3= Color3.fromRGB(31,31,31);
 	ModeListFrame.BorderSizePixel = 0;
 	ModeListFrame.ClipsDescendants= true;
 	ModeListFrame.Position        = UDim2.new(4,0,4,0);
@@ -1695,7 +1695,7 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	KeyInner.BackgroundColor3     = Color3.fromRGB(45, 45, 45);
 	KeyInner.BorderSizePixel      = 0;
 	KeyInner.Position             = UDim2.new(0,3,0,-1);
-	KeyInner.Size                 = UDim2.new(1,-6,1,-3);
+	KeyInner.Size                 = UDim2.new(1,-6,1,-5);
 	KeyInner.ZIndex               = 153;
 
 	KeyInnerCorner.CornerRadius   = UDim.new(0,4);
@@ -1853,8 +1853,10 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 		if bool then
 			IsOpen = true;
 			local h = getPopupH();
-			local px = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X + (Fatality.KeybindPopupXOffset or 0);
-			local py = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y + (Fatality.KeybindPopupYOffset or 0);
+			local typeXOff = isSlider and (Fatality.KeybindSliderXOffset or 36) or (Fatality.KeybindCheckboxXOffset or 77);
+			local typeYOff = isSlider and (Fatality.KeybindSliderYOffset or 0) or (Fatality.KeybindCheckboxYOffset or 0);
+			local px = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X + typeXOff;
+			local py = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y + typeYOff;
 			PopupFrame.Position = UDim2.fromOffset(px, py);
 			Fatality:CreateAnimation(PopupFrame, 0.45, { Size = UDim2.new(0,170,0,h) });
 			Fatality:CreateAnimation(PopupStroke,  0.45, { Transparency = 0 });
@@ -1862,8 +1864,8 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 			if SPAWN_THREAD then task.cancel(SPAWN_THREAD); SPAWN_THREAD = nil; end;
 			SPAWN_THREAD = task.spawn(function()
 				while true do task.wait(0.1);
-					local npx = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X + (Fatality.KeybindPopupXOffset or 0);
-					local npy = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y + (Fatality.KeybindPopupYOffset or 0);
+					local npx = CheckboxFrame.AbsolutePosition.X + CheckboxFrame.AbsoluteSize.X/2 - OwnWindow.AbsolutePosition.X + typeXOff;
+					local npy = CheckboxFrame.AbsolutePosition.Y + CheckboxFrame.AbsoluteSize.Y + 5 - OwnWindow.AbsolutePosition.Y + typeYOff;
 					Fatality:CreateAnimation(PopupFrame, 0.35, { Position = UDim2.fromOffset(npx,npy) });
 				end;
 			end);
@@ -6743,7 +6745,7 @@ function Fatality.new(Window: Window)
 			SectionName.BackgroundTransparency = 1.000
 			SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
 			SectionName.BorderSizePixel = 0
-			SectionName.Position = UDim2.new(0, (Fatality.SectionNameXOffset or 10), 0, (Fatality.SectionNameYOffset or -12))
+			SectionName.Position = UDim2.new(0, (Fatality.SectionNameXOffset or 10), 0, (Fatality.SectionNameYOffset or -8))
 			SectionName.Size = UDim2.new(1, 0, 0, 15)
 			SectionName.ZIndex = 10
 			SectionName.FontFace = Fatality.FontSemiBold;
