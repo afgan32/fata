@@ -5864,10 +5864,14 @@ function Fatality.new(Window: Window)
 		Left.BackgroundTransparency = 1.000
 		Left.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Left.BorderSizePixel = 0
-		Left.ClipsDescendants = true
+		Left.ClipsDescendants = false
 		Left.Position = UDim2.new(0.175, 0, 0.5, 0)
 		Left.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Left.ScrollBarThickness = 0
+
+		local LeftPad = Instance.new("UIPadding");
+		LeftPad.PaddingTop = UDim.new(0, 15);
+		LeftPad.Parent = Left;
 
 		UIListLayout.Parent = Left
 		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -5883,10 +5887,14 @@ function Fatality.new(Window: Window)
 		Center.BackgroundTransparency = 1.000
 		Center.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Center.BorderSizePixel = 0
-		Center.ClipsDescendants = true
+		Center.ClipsDescendants = false
 		Center.Position = UDim2.new(0.5, 0, 0.5, 0)
 		Center.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Center.ScrollBarThickness = 0
+
+		local CenterPad = Instance.new("UIPadding");
+		CenterPad.PaddingTop = UDim.new(0, 15);
+		CenterPad.Parent = Center;
 
 		UIListLayout_2.Parent = Center
 		UIListLayout_2.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -5902,10 +5910,14 @@ function Fatality.new(Window: Window)
 		Right.BackgroundTransparency = 1.000
 		Right.BorderColor3 = Color3.fromRGB(0, 0, 0)
 		Right.BorderSizePixel = 0
-		Right.ClipsDescendants = true
+		Right.ClipsDescendants = false
 		Right.Position = UDim2.new(0.825, 0, 0.5, 0)
 		Right.Size = UDim2.new(Fatality.GlobalSectionColumnWidth or 0.32, 0, 1, -5)
 		Right.ScrollBarThickness = 0
+
+		local RightPad = Instance.new("UIPadding");
+		RightPad.PaddingTop = UDim.new(0, 15);
+		RightPad.Parent = Right;
 
 		UIListLayout_3.Parent = Right
 		UIListLayout_3.HorizontalAlignment = Enum.HorizontalAlignment.Center
