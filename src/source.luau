@@ -451,7 +451,7 @@ function Fatality:SetSectionPadding(p)
 	end;
 end;
 Fatality.Version = '1.6';
-Fatality.UpdateVersion = 1;
+Fatality.UpdateVersion = 2;
 
 function Fatality:PrintUpdateVersion()
 	print("Fatality Update: " .. tostring(self.UpdateVersion))
@@ -5705,8 +5705,8 @@ function Fatality.new(Window: Window)
 	end)
 
 	function Fatal:SetSize(w, h)
-		local cw = FatalFrame.Size.X.Offset;
-		local ch = FatalFrame.Size.Y.Offset;
+		local cw = Window.Scale.X.Offset;
+		local ch = Window.Scale.Y.Offset;
 		local newSize = UDim2.new(0, w or cw, 0, h or ch);
 		Window.Scale = newSize;
 		Fatality:CreateAnimation(FatalFrame, 0.1, {
