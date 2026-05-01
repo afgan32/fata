@@ -5708,8 +5708,10 @@ function Fatality.new(Window: Window)
 		local cw = FatalFrame.Size.X.Offset;
 		local ch = FatalFrame.Size.Y.Offset;
 		local newSize = UDim2.new(0, w or cw, 0, h or ch);
-		FatalFrame.Size = newSize;
 		Window.Scale = newSize;
+		Fatality:CreateAnimation(FatalFrame, 0.1, {
+			Size = newSize
+		})
 	end;
 
 	function Fatal:SetPosition(x, y)
