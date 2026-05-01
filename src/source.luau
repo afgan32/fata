@@ -1336,7 +1336,14 @@ function Fatality:CreateHover(Element : Frame,Callback : (boolean) -> any)
 end;
 
 function Fatality:GetIcon(name : string) : string
-	return Fatality.Lucide['lucide-'..tostring(name)] or Fatality.Lucide[name] or Fatality.Lucide[tostring(name)] or "";
+	local icon = Fatality.Lucide['lucide-'..tostring(name)] or Fatality.Lucide[name] or Fatality.Lucide[tostring(name)] or "";
+	if icon:find("rbxassetid://") then
+		local id = icon:match("%d+")
+		if id then
+			return "rbxthumb://type=Asset&id="..id.."&w=150&h=150"
+		end
+	end
+	return icon;
 end;
 
 function Fatality:SetIcon(name : string, value : string)
