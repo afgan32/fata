@@ -451,6 +451,12 @@ function Fatality:SetSectionPadding(p)
 	end;
 end;
 Fatality.Version = '1.6';
+Fatality.UpdateVersion = 1;
+
+function Fatality:PrintUpdateVersion()
+	print("Fatality Update: " .. tostring(self.UpdateVersion))
+end
+
 Fatality.Lucide = {
 	["lucide-accessibility"] = "rbxassetid://10709751939",
 	["lucide-activity"] = "rbxassetid://10709752035",
