@@ -451,7 +451,7 @@ function Fatality:SetSectionPadding(p)
 	end;
 end;
 Fatality.Version = '1.6';
-Fatality.UpdateVersion = 2;
+Fatality.UpdateVersion = 3;
 
 function Fatality:PrintUpdateVersion()
 	print("Fatality Update: " .. tostring(self.UpdateVersion))
@@ -3596,7 +3596,8 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		boxli_mid.Parent = boxli
 		boxli_mid.BackgroundColor3 = Color3.fromRGB(158, 28, 47)
 		boxli_mid.BorderSizePixel = 0
-		boxli_mid.Position = UDim2.new(0, 0, 0, 1)
+		boxli_mid.AnchorPoint = Vector2.new(0.5, 0.5)
+		boxli_mid.Position = UDim2.new(0.5, 0, 0.5, 0)
 		boxli_mid.Size = UDim2.new(1, 0, 1, -2)
 		boxli_mid.ClipsDescendants = true
 		boxli_mid.ZIndex = ZIndex + 3
@@ -3610,7 +3611,8 @@ function Fatality:CreateElements(Parent : Frame , ZIndex : number , Event : Bind
 		boxli_fill.Parent = boxli_mid
 		boxli_fill.BackgroundColor3 = Fatality.Colors.Main
 		boxli_fill.BorderSizePixel = 0
-		boxli_fill.Position = UDim2.new(0, 0, 0, 1)
+		boxli_fill.AnchorPoint = Vector2.new(0.5, 0.5)
+		boxli_fill.Position = UDim2.new(0.5, 0, 0.5, 0)
 		boxli_fill.Size = UDim2.new(1, 0, 1, -2)
 		boxli_fill.ZIndex = ZIndex + 3
 		local boxli_fill_corner = Instance.new("UICorner")
