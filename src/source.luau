@@ -5701,7 +5701,9 @@ function Fatality.new(Window: Window)
 	function Fatal:SetSize(w, h)
 		local cw = FatalFrame.Size.X.Offset;
 		local ch = FatalFrame.Size.Y.Offset;
-		FatalFrame.Size = UDim2.new(0, w or cw, 0, h or ch);
+		local newSize = UDim2.new(0, w or cw, 0, h or ch);
+		FatalFrame.Size = newSize;
+		Window.Scale = newSize;
 	end;
 
 	function Fatal:SetPosition(x, y)
