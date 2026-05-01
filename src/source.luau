@@ -1949,6 +1949,14 @@ function Fatality:CreateKeybindPopup(CheckboxFrame: Frame, ParentToggle: Frame, 
 	local TogglePopup = function(bool)
 		if bool then
 			-- close any other open keybind popup first
+			if Fatality.CurrentDropdown then
+				Fatality.CurrentDropdown();
+				Fatality.CurrentDropdown = nil;
+			end;
+			if Fatality.CurrentOptionClose then
+				Fatality.CurrentOptionClose(false);
+				Fatality.CurrentOptionClose = nil;
+			end;
 			if Fatality.CurrentKeybindClose and Fatality.CurrentKeybindClose ~= TogglePopup then
 				Fatality.CurrentKeybindClose(false);
 			end;
@@ -2235,6 +2243,18 @@ function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): E
 	local ToggleExt = function(bool)
 		if bool then
 			if #ScrollingFrame:GetChildren() <= 2 then return end
+			if Fatality.CurrentDropdown then
+				Fatality.CurrentDropdown();
+				Fatality.CurrentDropdown = nil;
+			end;
+			if Fatality.CurrentKeybindClose then
+				Fatality.CurrentKeybindClose(false);
+				Fatality.CurrentKeybindClose = nil;
+			end;
+			if Fatality.CurrentOptionClose and Fatality.CurrentOptionClose ~= ToggleExt then
+				Fatality.CurrentOptionClose(false);
+			end;
+			Fatality.CurrentOptionClose = ToggleExt;
 			Bindable:SetAttribute('V',true);
 			Bindable:Fire(true);
 
@@ -2270,6 +2290,9 @@ function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): E
 				end;
 			end)
 		else
+			if Fatality.CurrentOptionClose == ToggleExt then
+				Fatality.CurrentOptionClose = nil;
+			end;
 			if SPAWN_THREAD then
 				task.cancel(SPAWN_THREAD);
 				SPAWN_THREAD = nil;
@@ -3027,6 +3050,14 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 
 	local Toggle = function(value)
 		if value then
+			if Fatality.CurrentKeybindClose then
+				Fatality.CurrentKeybindClose(false);
+				Fatality.CurrentKeybindClose = nil;
+			end;
+			if Fatality.CurrentOptionClose then
+				Fatality.CurrentOptionClose(false);
+				Fatality.CurrentOptionClose = nil;
+			end;
 			if not ClickBlocker then
 				ClickBlocker = Instance.new("Frame");
 				ClickBlocker.Name = Fatality:RandomString();
@@ -6924,17 +6955,22 @@ function Fatality.new(Window: Window)
 						return;
 					end;
 					if Fatality:IsMouseOverFrame(Section) then
+						-- auto-close any open popups on scroll attempt
+						if Fatality.CurrentDropdown then
+							Fatality.CurrentDropdown();
+							Fatality.CurrentDropdown = nil;
+						end;
+						if Fatality.CurrentKeybindClose then
+							Fatality.CurrentKeybindClose(false);
+							Fatality.CurrentKeybindClose = nil;
+						end;
+						if Fatality.CurrentOptionClose then
+							Fatality.CurrentOptionClose(false);
+							Fatality.CurrentOptionClose = nil;
+						end;
+
 						local maxY = Elements.AbsoluteCanvasSize.Y - Elements.AbsoluteSize.Y;
 						if maxY > 1 then
-							-- auto-close any open dropdown and keybind popups before scrolling
-							if Fatality.CurrentDropdown then
-								Fatality.CurrentDropdown();
-								Fatality.CurrentDropdown = nil;
-							end;
-							if Fatality.CurrentKeybindClose then
-								Fatality.CurrentKeybindClose(false);
-								Fatality.CurrentKeybindClose = nil;
-							end;
 							local newY = math.clamp(Elements.CanvasPosition.Y - input.Position.Z * SCROLL_STEP, 0, maxY);
 							Elements.CanvasPosition = Vector2.new(0, newY);
 						end;
