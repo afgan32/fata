@@ -312,6 +312,8 @@ Fatality.GlobalDropdownWidth  = 83;
 Fatality.GlobalDropdownHeight = 23;
 Fatality.CheckboxFrames       = {};
 Fatality.OptionIconFrames     = {};
+Fatality.MenuIcons            = {};
+Fatality.MenuLabels           = {};
 
 function Fatality:SetGlobalSliderWidth(w)
 	Fatality.GlobalSliderWidth = w;
@@ -431,6 +433,29 @@ function Fatality:SetSubTabWidth(w)
 	end;
 end;
 
+function Fatality:SetMenuIconSize(name, x, y)
+	local icon = Fatality.MenuIcons[name];
+	if icon and typeof(icon) == "Instance" and icon.Parent then
+		icon.SizeConstraint = Enum.SizeConstraint.RelativeXY;
+		icon.Size = UDim2.new(0, x, 0, y);
+	end;
+end;
+
+function Fatality:SetMenuIconPositionX(name, x)
+	local icon = Fatality.MenuIcons[name];
+	if icon and typeof(icon) == "Instance" and icon.Parent then
+		icon.Position = UDim2.new(0, x, icon.Position.Y.Scale, icon.Position.Y.Offset);
+	end;
+end;
+
+function Fatality:SetMenuLabelTextSize(s)
+	for _, lbl in pairs(Fatality.MenuLabels) do
+		if typeof(lbl) == "Instance" and lbl.Parent then
+			lbl.TextSize = s;
+		end;
+	end;
+end;
+
 function Fatality:SetSubTabColumnWidth(s)
 	Fatality.SubTabColumnWidth = s;
 	if Fatality._SubTabReposition then
@@ -451,7 +476,7 @@ function Fatality:SetSectionPadding(p)
 	end;
 end;
 Fatality.Version = '1.6';
-Fatality.UpdateVersion = 3;
+Fatality.UpdateVersion = 4;
 
 function Fatality:PrintUpdateVersion()
 	print("Fatality Update: " .. tostring(self.UpdateVersion))
@@ -5940,6 +5965,9 @@ function Fatality.new(Window: Window)
 		menu_name.TextStrokeTransparency = 0.900
 		menu_name.TextTransparency = 0.150
 		menu_name.TextXAlignment = Enum.TextXAlignment.Left
+
+		Fatality.MenuIcons[Menu.Name] = Icon;
+		Fatality.MenuLabels[Menu.Name] = menu_name;
 
 		local text_size = Fatality:GetTextSize(menu_name);
 
