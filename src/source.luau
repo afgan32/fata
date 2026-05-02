@@ -6877,6 +6877,7 @@ function Fatality.new(Window: Window)
 			local UIListLayout = Instance.new("UIListLayout")
 			local SpaceBox = Instance.new("Frame")
 			local SectionName = Instance.new("TextLabel")
+			local SectionGlow1, SectionGlow2
 
 			local Toggle = function(v)
 				if v then
@@ -6927,7 +6928,7 @@ function Fatality.new(Window: Window)
 
 			-- 3px fade glow around each section: 40,40,39 > 45,45,45 > 39,39,38
 			-- Outer glow frame 1 (2px outset)
-			local SectionGlow1 = Instance.new("Frame")
+			SectionGlow1 = Instance.new("Frame")
 			SectionGlow1.Name = Fatality:RandomString()
 			SectionGlow1.Parent = Section
 			SectionGlow1.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -6942,7 +6943,7 @@ function Fatality.new(Window: Window)
 			SectionGlow1Corner.Parent = SectionGlow1
 
 			-- Outer glow frame 2 (3px outset)
-			local SectionGlow2 = Instance.new("Frame")
+			SectionGlow2 = Instance.new("Frame")
 			SectionGlow2.Name = Fatality:RandomString()
 			SectionGlow2.Parent = Section
 			SectionGlow2.AnchorPoint = Vector2.new(0.5, 0.5)
