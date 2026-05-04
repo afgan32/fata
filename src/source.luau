@@ -5286,8 +5286,6 @@ function Fatality.new(Window: Window)
 	local InfoButton = Instance.new("ImageButton")
 	local SearchButton = Instance.new("ImageButton")
 	local SaveButton = Instance.new("ImageButton")
-	local HeaderFade2
-	local BottomFade2
 
 	Fatality.WindowFlags[Fatalitywin] = {};
 
@@ -5323,7 +5321,7 @@ function Fatality.new(Window: Window)
 			})
 
 			Fatality:CreateAnimation(HeaderLine,0.5,{
-				BackgroundTransparency = 0.35,
+				BackgroundTransparency = 0,
 			})
 
 			Fatality:CreateAnimation(Bottom,0.5,{
@@ -5331,12 +5329,8 @@ function Fatality.new(Window: Window)
 			})
 
 			Fatality:CreateAnimation(HeaderLine_2,0.5,{
-				BackgroundTransparency = 0.35,
+				BackgroundTransparency = 0,
 			})
-
-			-- fade border animations (open)
-			if HeaderFade2 then Fatality:CreateAnimation(HeaderFade2, 0.5, { BackgroundTransparency = 0.65 }) end;
-			if BottomFade2 then Fatality:CreateAnimation(BottomFade2, 0.5, { BackgroundTransparency = 0.65 }) end;
 
 			Fatality:CreateAnimation(HeaderLineShadow,0.5,{
 				BackgroundTransparency = 0.5,
@@ -5493,10 +5487,6 @@ function Fatality.new(Window: Window)
 				BackgroundTransparency = 1,
 			})
 
-			-- fade border animations (close)
-			if HeaderFade2 then Fatality:CreateAnimation(HeaderFade2, 0.5, { BackgroundTransparency = 1 }) end;
-			if BottomFade2 then Fatality:CreateAnimation(BottomFade2, 0.5, { BackgroundTransparency = 1 }) end;
-
 			Fatality:CreateAnimation(DropShadow,0.35,{
 				ImageTransparency = 1
 			})
@@ -5556,27 +5546,23 @@ function Fatality.new(Window: Window)
 	Header.Size = UDim2.new(1, 0, 0, 40)
 	Header.ZIndex = 2
 
-	-- 3px fade border at bottom of Header: 38,38,38 > 47,47,46 > 31,31,31
 	HeaderLine.Name = Fatality:RandomString()
 	HeaderLine.Parent = Header
-	HeaderLine.AnchorPoint = Vector2.new(0, 0)
-	HeaderLine.BackgroundColor3 = Color3.fromRGB(47, 47, 46)
-	HeaderLine.BackgroundTransparency = 0.35
+	HeaderLine.AnchorPoint = Vector2.new(0, 1)
+	HeaderLine.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+	HeaderLine.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLine.BorderSizePixel = 0
 	HeaderLine.Position = UDim2.new(0, 0, 1, 0)
-	HeaderLine.Size = UDim2.new(1, 0, 0, 1)
+	HeaderLine.Size = UDim2.new(1, 0, 0, 6)
+	HeaderLine.Visible = false
 	HeaderLine.ZIndex = 8
 
-	HeaderFade2 = Instance.new("Frame")
-	HeaderFade2.Name = Fatality:RandomString()
-	HeaderFade2.Parent = Header
-	HeaderFade2.AnchorPoint = Vector2.new(0, 0)
-	HeaderFade2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
-	HeaderFade2.BackgroundTransparency = 0.65
-	HeaderFade2.BorderSizePixel = 0
-	HeaderFade2.Position = UDim2.new(0, 0, 1, 1)
-	HeaderFade2.Size = UDim2.new(1, 0, 0, 1)
-	HeaderFade2.ZIndex = 8
+	local HLGlow = Instance.new("UIGradient", HeaderLine)
+	HLGlow.Rotation = 90
+	HLGlow.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
 
 	UICorner_2.CornerRadius = UDim.new(0, 5)
 	UICorner_2.Parent = Header
@@ -5732,27 +5718,23 @@ function Fatality.new(Window: Window)
 	Bottom.Size = UDim2.new(1, 0, 0, 25)
 	Bottom.ZIndex = 2
 
-	-- 3px fade border at top of Bottom bar: 47,47,46 > 47,47,46 > 31,31,31 (mirrored)
 	HeaderLine_2.Name = Fatality:RandomString()
 	HeaderLine_2.Parent = Bottom
 	HeaderLine_2.AnchorPoint = Vector2.new(0, 1)
-	HeaderLine_2.BackgroundColor3 = Color3.fromRGB(47, 47, 46)
-	HeaderLine_2.BackgroundTransparency = 0.35
+	HeaderLine_2.BackgroundColor3 = Color3.fromRGB(26, 26, 26)
+	HeaderLine_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	HeaderLine_2.BorderSizePixel = 0
 	HeaderLine_2.Position = UDim2.new(0, 0, 0, 0)
-	HeaderLine_2.Size = UDim2.new(1, 0, 0, 1)
+	HeaderLine_2.Size = UDim2.new(1, 0, 0, 6)
 	HeaderLine_2.ZIndex = 8
+	HeaderLine_2.Visible = false
 
-	BottomFade2 = Instance.new("Frame")
-	BottomFade2.Name = Fatality:RandomString()
-	BottomFade2.Parent = Bottom
-	BottomFade2.AnchorPoint = Vector2.new(0, 1)
-	BottomFade2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
-	BottomFade2.BackgroundTransparency = 0.65
-	BottomFade2.BorderSizePixel = 0
-	BottomFade2.Position = UDim2.new(0, 0, 0, -1)
-	BottomFade2.Size = UDim2.new(1, 0, 0, 1)
-	BottomFade2.ZIndex = 8
+	local HLGlow2 = Instance.new("UIGradient", HeaderLine_2)
+	HLGlow2.Rotation = -90
+	HLGlow2.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0),
+		NumberSequenceKeypoint.new(1, 1)
+	})
 
 	UICorner_5.CornerRadius = UDim.new(0, 4)
 	UICorner_5.Parent = Bottom
@@ -6877,17 +6859,12 @@ function Fatality.new(Window: Window)
 			local UIListLayout = Instance.new("UIListLayout")
 			local SpaceBox = Instance.new("Frame")
 			local SectionName = Instance.new("TextLabel")
-			local SectionGlow1, SectionGlow2
 
 			local Toggle = function(v)
 				if v then
 					Fatality:CreateAnimation(Section,0.5,{
 						BackgroundTransparency = 0
 					})
-
-					Fatality:CreateAnimation(SectionStroke, 0.5, { Transparency = 0 })
-					Fatality:CreateAnimation(SectionGlow1, 0.5, { BackgroundTransparency = 0.55 })
-					Fatality:CreateAnimation(SectionGlow2, 0.5, { BackgroundTransparency = 0.70 })
 
 					Fatality:CreateAnimation(SectionName,0.5,{
 						TextStrokeTransparency = 0.750,
@@ -6897,10 +6874,6 @@ function Fatality.new(Window: Window)
 					Fatality:CreateAnimation(Section,0.5,{
 						BackgroundTransparency = 1
 					})
-
-					Fatality:CreateAnimation(SectionStroke, 0.5, { Transparency = 1 })
-					Fatality:CreateAnimation(SectionGlow1, 0.5, { BackgroundTransparency = 1 })
-					Fatality:CreateAnimation(SectionGlow2, 0.5, { BackgroundTransparency = 1 })
 
 					Fatality:CreateAnimation(SectionName,0.5,{
 						TextStrokeTransparency = 1,
@@ -6925,37 +6898,6 @@ function Fatality.new(Window: Window)
 			SectionStroke.Color = Color3.fromRGB(40, 40, 39)
 			SectionStroke.Thickness = 1;
 			SectionStroke.Parent = Section
-
-			-- 3px fade glow around each section: 40,40,39 > 45,45,45 > 39,39,38
-			-- Outer glow frame 1 (2px outset)
-			SectionGlow1 = Instance.new("Frame")
-			SectionGlow1.Name = Fatality:RandomString()
-			SectionGlow1.Parent = Section
-			SectionGlow1.AnchorPoint = Vector2.new(0.5, 0.5)
-			SectionGlow1.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-			SectionGlow1.BackgroundTransparency = 0.55
-			SectionGlow1.BorderSizePixel = 0
-			SectionGlow1.Position = UDim2.new(0.5, 0, 0.5, 0)
-			SectionGlow1.Size = UDim2.new(1, 4, 1, 4)
-			SectionGlow1.ZIndex = -1
-			local SectionGlow1Corner = Instance.new("UICorner")
-			SectionGlow1Corner.CornerRadius = UDim.new(0, 6)
-			SectionGlow1Corner.Parent = SectionGlow1
-
-			-- Outer glow frame 2 (3px outset)
-			SectionGlow2 = Instance.new("Frame")
-			SectionGlow2.Name = Fatality:RandomString()
-			SectionGlow2.Parent = Section
-			SectionGlow2.AnchorPoint = Vector2.new(0.5, 0.5)
-			SectionGlow2.BackgroundColor3 = Color3.fromRGB(39, 39, 38)
-			SectionGlow2.BackgroundTransparency = 0.70
-			SectionGlow2.BorderSizePixel = 0
-			SectionGlow2.Position = UDim2.new(0.5, 0, 0.5, 0)
-			SectionGlow2.Size = UDim2.new(1, 6, 1, 6)
-			SectionGlow2.ZIndex = -2
-			local SectionGlow2Corner = Instance.new("UICorner")
-			SectionGlow2Corner.CornerRadius = UDim.new(0, 7)
-			SectionGlow2Corner.Parent = SectionGlow2
 
 			Elements.Name = Fatality:RandomString()
 			Elements.Parent = Section
