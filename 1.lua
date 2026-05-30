@@ -1,4 +1,5 @@
 local Fatality = loadstring(game:HttpGet("https://raw.githubusercontent.com/afgan32/fata/refs/heads/main/src/source.luau?t=" .. tostring(tick())))();
+Fatality:PrintUpdateVersion()
 local Notification = Fatality:CreateNotifier();
 
 Fatality:Loader({
@@ -408,49 +409,61 @@ do
 end
 
 do
-	local Misc = Visual:AddSection({
+	local SubTabs = Visual:AddSubTabs({"Local", "Enemy", "Team", "World"})
+
+	-- Local sub-tab
+	local LocalMisc = SubTabs["Local"]:AddSection({
 		Name = "MISC",
 		Position = 'left'
 	})
 
-	local Model = Visual:AddSection({
+	local LocalModel = SubTabs["Local"]:AddSection({
 		Name = "MODEL",
 		Position = 'center'
 	})
 
-	Misc:AddToggle({
+	local LocalExtra = SubTabs["Local"]:AddSection({
+		Name = "EXTRA",
+		Position = 'right'
+	})
+
+	LocalExtra:AddToggle({ Name = "Test Toggle 1" })
+	LocalExtra:AddToggle({ Name = "Test Toggle 2" })
+	LocalExtra:AddSlider({ Name = "Test Slider" })
+
+	LocalMisc:AddToggle({
 		Name = "Thirdperson",
 		Option = true
 	}).Option:AddSlider({
 		Name = "Distance"
 	});
 
-	Misc:AddToggle({
+	LocalMisc:AddToggle({
 		Name = "Overhead override",
 		Option = true
 	}).Option:AddDropdown({
 		Name = "Override"
 	});
 
-	Misc:AddToggle({
+	LocalMisc:AddToggle({
 		Name = "Fov override",
 		Option = true
 	}).Option:AddToggle({
 		Name = "Something"
 	})
 
-	Misc:AddToggle({
+	LocalMisc:AddToggle({
 		Name = "Viewmodel override",
 		Option = true
 	}).Option:AddToggle({
 		Name = "Something"
 	})
 
-	Misc:AddDropdown({
+	LocalMisc:AddDropdown({
 		Name = "Remove scope"
 	})
 
-	local pc = Misc:AddToggle({
+	local pc = LocalMisc:AddToggle({
 		Name = "Penetration crosshair",
 		Option = true
 	}).Option;
@@ -465,18 +478,18 @@ do
 		Default = Color3.fromRGB(255, 0, 4)
 	})
 
-	Misc:AddToggle({
+	LocalMisc:AddToggle({
 		Name = "Force crosshair",
 		Option = true
 	}).Option:AddToggle({
 		Name = "Something"
 	})
 
-	Misc:AddDropdown({
+	LocalMisc:AddDropdown({
 		Name = "Spread"
 	})
 
-	Misc:AddToggle({
+	LocalMisc:AddToggle({
 		Name = "Bullet tracer",
 		Option = true
 	}).Option:AddColorPicker({
@@ -484,48 +497,84 @@ do
 		Default = Color3.fromRGB(255, 41, 116)
 	})
 
-	Model:AddDropdown({
+	LocalModel:AddDropdown({
 		Name = "Visible",
 		Default = "Disabled",
 		Values = {"Disabled",'Something'}
 	})
 
-	Model:AddDropdown({
+	LocalModel:AddDropdown({
 		Name = "Invisible",
 		Default = "Disabled",
 		Values = {"Disabled",'Something'}
 	})
 
-	Model:AddDropdown({
+	LocalModel:AddDropdown({
 		Name = "Arms",
 		Default = "Disabled",
 		Values = {"Disabled",'Something'}
 	})
 
-	Model:AddDropdown({
+	LocalModel:AddDropdown({
 		Name = "Viewmodel",
 		Default = "Disabled",
 		Values = {"Disabled",'Something'}
 	})
 
-	Model:AddDropdown({
+	LocalModel:AddDropdown({
 		Name = "Attachments",
 		Default = "Disabled",
 		Values = {"Disabled",'Something'}
 	})
 
-	Model:AddToggle({
+	LocalModel:AddToggle({
 		Name = 'Glow',
 		Option = true
-
 	}).Option:AddColorPicker({
 		Name = "Color"
 	})
 
-	Model:AddKeybind({
+	LocalModel:AddKeybind({
 		Name = "Toggle"
 	})
 
+	-- Enemy sub-tab
+	local EnemyGeneral = SubTabs["Enemy"]:AddSection({
+		Name = "GENERAL",
+		Position = 'left'
+	})
+
+	local EnemyESP = SubTabs["Enemy"]:AddSection({
+		Name = "ESP",
+		Position = 'center'
+	})
+
+	EnemyGeneral:AddToggle({ Name = "Enabled" })
+
+	EnemyESP:AddToggle({ Name = "Name" })
+	EnemyESP:AddToggle({ Name = "Box", Option = true }).Option:AddColorPicker({
+		Name = "Color",
+		Default = Color3.fromRGB(255, 75, 75)
+	})
+	EnemyESP:AddToggle({ Name = "Health" })
+	EnemyESP:AddToggle({ Name = "Skeleton" })
+
+	-- Team sub-tab
+	local TeamGeneral = SubTabs["Team"]:AddSection({
+		Name = "GENERAL",
+		Position = 'left'
+	})
+	TeamGeneral:AddToggle({ Name = "Enabled" })
+	TeamGeneral:AddToggle({ Name = "Name" })
+
+	-- World sub-tab
+	local WorldGeneral = SubTabs["World"]:AddSection({
+		Name = "GENERAL",
+		Position = 'left'
+	})
+	WorldGeneral:AddToggle({ Name = "Enabled" })
+	WorldGeneral:AddToggle({ Name = "Item name" })
+	WorldGeneral:AddToggle({ Name = "Item icon" })
 end
 
 do
@@ -550,11 +599,10 @@ do
 
 	Settings:AddSlider({
 		Name = "Menu Width",
-		Default = 770,
+		Default = 780,
 		Min = 500,
 		Max = 1100,
 		Round = 0,
-		ApplyOnRelease = true,
 		Callback = function(v)
 			Window:SetSize(v, nil)
 		end
@@ -562,11 +610,10 @@ do
 
 	Settings:AddSlider({
 		Name = "Menu Height",
-		Default = 536,
+		Default = 540,
 		Min = 350,
 		Max = 750,
 		Round = 0,
-		ApplyOnRelease = true,
 		Callback = function(v)
 			Window:SetSize(nil, v)
 		end
@@ -621,6 +668,30 @@ do
 	})
 
 	Settings:AddSlider({
+		Name = "Sub-Tab Column Width",
+		Default = 27,
+		Min = 20,
+		Max = 45,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetSubTabColumnWidth(v / 100)
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Section Y Spacing",
+		Default = 14,
+		Min = 0,
+		Max = 40,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetSectionPadding(v)
+		end
+	})
+
+	Settings:AddSlider({
 		Name = "Slider Width",
 		Default = 88,
 		Min = 50,
@@ -670,7 +741,7 @@ do
 
 	Settings:AddSlider({
 		Name = "Section Name Y Offset",
-		Default = -12,
+		Default = -8,
 		Min = -30,
 		Max = 10,
 		Round = 0,
@@ -693,6 +764,44 @@ do
 	})
 
 	Settings:AddSlider({
+		Name = "Section Name Size",
+		Default = 12,
+		Min = 8,
+		Max = 20,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetSectionNameTextSize(v)
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Checkbox Scale",
+		Default = 90,
+		Min = 40,
+		Max = 100,
+		Round = 0,
+		Suffix = "%",
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetCheckboxScale(v / 100)
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Settings Icon Scale",
+		Default = 92,
+		Min = 40,
+		Max = 100,
+		Round = 0,
+		Suffix = "%",
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetOptionIconScale(v / 100)
+		end
+	})
+
+	Settings:AddSlider({
 		Name = "Dropdown Popup X Offset",
 		Default = 0,
 		Min = -50,
@@ -705,26 +814,169 @@ do
 	})
 
 	Settings:AddSlider({
-		Name = "Keybind Popup X Offset",
-		Default = 0,
-		Min = -80,
-		Max = 80,
+		Name = "Keybind Slider X Offset",
+		Default = 36,
+		Min = -20,
+		Max = 150,
 		Round = 0,
 		ApplyOnRelease = true,
 		Callback = function(v)
-			Fatality:SetKeybindPopupXOffset(v)
+			Fatality.KeybindSliderXOffset = v
 		end
 	})
 
 	Settings:AddSlider({
-		Name = "Keybind Popup Y Offset",
+		Name = "Keybind Slider Y Offset",
 		Default = 0,
 		Min = -40,
 		Max = 40,
 		Round = 0,
 		ApplyOnRelease = true,
 		Callback = function(v)
-			Fatality:SetKeybindPopupYOffset(v)
+			Fatality.KeybindSliderYOffset = v
 		end
 	})
+
+	Settings:AddSlider({
+		Name = "Keybind Checkbox X Offset",
+		Default = 78,
+		Min = -20,
+		Max = 150,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality.KeybindCheckboxXOffset = v
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Keybind Checkbox Y Offset",
+		Default = 0,
+		Min = -40,
+		Max = 40,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality.KeybindCheckboxYOffset = v
+		end
+	})
+
+	Settings:AddSlider({
+		Name = "Sub-Tab Area Width",
+		Default = 105,
+		Min = 40,
+		Max = 150,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetSubTabWidth(v)
+		end
+	})
+
+	local TabNames = Misc:AddSection({
+		Name = "TAB NAMES",
+		Position = 'center'
+	})
+
+	TabNames:AddSlider({
+		Name = "Name Size",
+		Default = 11,
+		Min = 5,
+		Max = 25,
+		Round = 0,
+		ApplyOnRelease = true,
+		Callback = function(v)
+			Fatality:SetMenuLabelTextSize(v)
+		end
+	})
+
+	local menusCenter = {"RAGE", "LEGIT", "VISUAL"}
+	for _, menuName in ipairs(menusCenter) do
+		local sec = Misc:AddSection({
+			Name = menuName .. " ICON",
+			Position = 'center'
+		})
+		sec:AddSlider({
+			Name = "Size X",
+			Default = 20,
+			Min = 5,
+			Max = 50,
+			Round = 0,
+			ApplyOnRelease = true,
+			Callback = function(v)
+				local y = Fatality.MenuIcons[menuName] and Fatality.MenuIcons[menuName].Size.Y.Offset or 20
+				if y == 0 then y = 20 end
+				Fatality:SetMenuIconSize(menuName, v, y)
+			end
+		})
+		sec:AddSlider({
+			Name = "Size Y",
+			Default = 20,
+			Min = 5,
+			Max = 50,
+			Round = 0,
+			ApplyOnRelease = true,
+			Callback = function(v)
+				local x = Fatality.MenuIcons[menuName] and Fatality.MenuIcons[menuName].Size.X.Offset or 20
+				if x == 0 then x = 20 end
+				Fatality:SetMenuIconSize(menuName, x, v)
+			end
+		})
+		sec:AddSlider({
+			Name = "Position X",
+			Default = 5,
+			Min = 0,
+			Max = 30,
+			Round = 0,
+			ApplyOnRelease = true,
+			Callback = function(v)
+				Fatality:SetMenuIconPositionX(menuName, v)
+			end
+		})
+	end
+
+	local menusRight = {"MISC", "SKINS", "LUA"}
+	for _, menuName in ipairs(menusRight) do
+		local sec = Misc:AddSection({
+			Name = menuName .. " ICON",
+			Position = 'right'
+		})
+		sec:AddSlider({
+			Name = "Size X",
+			Default = 20,
+			Min = 5,
+			Max = 50,
+			Round = 0,
+			ApplyOnRelease = true,
+			Callback = function(v)
+				local y = Fatality.MenuIcons[menuName] and Fatality.MenuIcons[menuName].Size.Y.Offset or 20
+				if y == 0 then y = 20 end
+				Fatality:SetMenuIconSize(menuName, v, y)
+			end
+		})
+		sec:AddSlider({
+			Name = "Size Y",
+			Default = 20,
+			Min = 5,
+			Max = 50,
+			Round = 0,
+			ApplyOnRelease = true,
+			Callback = function(v)
+				local x = Fatality.MenuIcons[menuName] and Fatality.MenuIcons[menuName].Size.X.Offset or 20
+				if x == 0 then x = 20 end
+				Fatality:SetMenuIconSize(menuName, x, v)
+			end
+		})
+		sec:AddSlider({
+			Name = "Position X",
+			Default = 5,
+			Min = 0,
+			Max = 30,
+			Round = 0,
+			ApplyOnRelease = true,
+			Callback = function(v)
+				Fatality:SetMenuIconPositionX(menuName, v)
+			end
+		})
+	end
 end
