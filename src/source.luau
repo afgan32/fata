@@ -7078,7 +7078,7 @@ function Fatality.new(Window: Window)
 		end;
 		function MenuLib:AddSubTabs(tabNames)
 			-- sidebar width (configurable)
-			local SIDEBAR_W = Fatality.SubTabWidth or 70;
+			local SIDEBAR_W = 105;
 
 			-- create sidebar container
 			local Sidebar = Instance.new("Frame");
@@ -7097,7 +7097,7 @@ function Fatality.new(Window: Window)
 
 			-- block sub-tab columns from overlapping global SectionColumnWidth slider loops
 			local function repositionColumns()
-				local w = Fatality.SubTabWidth or 70;
+				local w = 105;
 				Sidebar.Size = UDim2.new(0, w, 1, -10);
 				
 				local shiftX = w + 10;
