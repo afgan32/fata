@@ -2434,7 +2434,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 			})
 
 			Fatality:CreateAnimation(ColorOptSlide,0.35,{
-				Position = UDim2.new(1 - CurrentTransparency, 0, 0.5, 0)
+				Position = UDim2.new(CodeV, 0, 0.5, 0)
 			})
 
 			Fatality:CreateAnimation(ColorPickerFrame,0.45,{
