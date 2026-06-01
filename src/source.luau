@@ -293,6 +293,7 @@ end
 
 Fatality.Ascii = "qwertyuiopasdfghjklzxcvbnmQWRTYUIOPASDFGHJKLZXCVBNM";
 Fatality.GLOBAL_ENVIRONMENT = {};
+Fatality._ColorPickerClosers = {};
 Fatality.Windows = {};
 Fatality.FontSemiBold = Font.new('rbxasset://fonts/families/GothamSSm.json',Enum.FontWeight.SemiBold,Enum.FontStyle.Normal);
 Fatality.Flags = {};
@@ -2398,6 +2399,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	local IsPressM1 = false;
 	local UI_SPAWN_THREAD;
 	local CurrentTransparency = Transparency or 0;
+	local ColorPickerIsOpen = false;
 
 	local updateColor = function()
 		local H , S , V = ColorBox.BackgroundColor3:ToHSV();
@@ -2408,9 +2410,10 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	end;
 
 	local VisibleToggle = function(value)
+		ColorPickerIsOpen = value;
 		if value then
 			ColorPickBox.BackgroundColor3 = Color3.fromHSV(OldCode,1,1);
-			ColorOpc.BackgroundColor3 = ColorBox.BackgroundColor3;
+			ColorOpc.BackgroundColor3 = Color3.fromHSV(OldCode, CodeH, 1);
 
 			HexCodeText.Text = "#" .. tostring(ColorPickBox.BackgroundColor3:ToHex())
 
@@ -2440,7 +2443,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 			})
 
 			Fatality:CreateAnimation(ColorOptSlide,0.35,{
-				Position = UDim2.new(1 - CurrentTransparency, 0, 0.5, 0)
+				Position = UDim2.new(CodeV, 0, 0.5, 0)
 			})
 
 			Fatality:CreateAnimation(ColorPickerFrame,0.45,{
@@ -2837,7 +2840,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 
 			ColorPickBox.BackgroundColor3 = Color3.fromHSV(h,1,1);
 
-			ColorOpc.BackgroundColor3 = Fatality.GLOBAL_ENVIRONMENT.COLOR_COPY.RGB;
+			ColorOpc.BackgroundColor3 = Color3.fromHSV(OldCode, CodeH, 1);
 
 			Callback(Color3.fromHSV(OldCode,CodeH,CodeV));
 		end;
@@ -2851,6 +2854,8 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	end)
 
 	VisibleToggle(false);
+
+	table.insert(Fatality._ColorPickerClosers, function() VisibleToggle(false) end);
 
 	Fatality:NewInput(ColorBox,function()
 		VisibleToggle(true);
@@ -2891,7 +2896,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 
 		UserInputService.InputBegan:Connect(function(Input)
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-				if IsOpen and not Fatality:IsMouseOverFrame(ColorPickerFrame) then
+				if ColorPickerIsOpen and not Fatality:IsMouseOverFrame(ColorPickerFrame) then
 					VisibleToggle(false);
 				end;
 			end;
@@ -2918,7 +2923,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 					});
 
 					Fatality:CreateAnimation(ColorOpc,0.35,{
-						BackgroundColor3 = Color
+						BackgroundColor3 = Color3.fromHSV(Code, CodeH, 1)
 					});
 
 					Fatality:CreateAnimation(ColorPickBox,0.5,{
@@ -2939,15 +2944,23 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 
 				while (UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or IsPressM1) do task.wait()
 					local t = math.clamp((((Mouse.X) - ColorOpc.AbsolutePosition.X) / ColorOpc.AbsoluteSize.X), 0, 1);
-					CurrentTransparency = 1 - t;
+					CodeV = t;
+					local newCol = Color3.fromHSV(OldCode, CodeH, CodeV);
 
 					Fatality:CreateAnimation(ColorOptSlide,0.35,{
 						Position = UDim2.new(t, 0, 0.5, 0)
 					});
+					
+					Fatality:CreateAnimation(MouseMovement,0.2,nil,{
+						Position = UDim2.new(CodeH, 0, 1 - CodeV, 0)
+					})
 
-					ColorBox.BackgroundTransparency = CurrentTransparency;
-					HexCodeText.Text = "#" .. tostring(ColorBox.BackgroundColor3:ToHex());
-					Callback(Color3.fromHSV(OldCode, CodeH, CodeV), CurrentTransparency);
+					Fatality:CreateAnimation(ColorBox,0.5,{
+						BackgroundColor3 = newCol
+					});
+
+					HexCodeText.Text = "#" .. tostring(newCol:ToHex());
+					Callback(newCol, CurrentTransparency);
 				end;
 			end;
 		end);
@@ -2973,7 +2986,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 					});
 
 					Fatality:CreateAnimation(ColorOpc,0.35,{
-						BackgroundColor3 = newCol
+						BackgroundColor3 = Color3.fromHSV(OldCode, CodeH, 1)
 					});
 
 					HexCodeText.Text = "#" .. tostring(newCol:ToHex())
@@ -2982,7 +2995,6 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 						Position = UDim2.new(CodeH, 0, 1 - CodeV, 0)
 					})
 
-					ColorBox.BackgroundTransparency = CurrentTransparency;
 					Callback(newCol, CurrentTransparency);
 				end
 			end
@@ -5317,6 +5329,12 @@ function Fatality.new(Window: Window)
 
 	local ToggleUI = function(bool)
 		Fatal.Signal:Fire(bool);
+
+		if not bool then
+			for _, closer in ipairs(Fatality._ColorPickerClosers or {}) do
+				pcall(closer)
+			end
+		end
 
 		if bool then
 			for i,v in next , Fatal.Menus do
