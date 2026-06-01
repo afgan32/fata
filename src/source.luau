@@ -2392,6 +2392,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	local CodeH,CodeV = 1, 1;
 	local IsPressM1 = false;
 	local UI_SPAWN_THREAD;
+	local CurrentTransparency = Transparency or 0;
 
 	local updateColor = function()
 		local H , S , V = ColorBox.BackgroundColor3:ToHSV();
@@ -2434,7 +2435,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 			})
 
 			Fatality:CreateAnimation(ColorOptSlide,0.35,{
-				Position = UDim2.new(CodeV, 0, 0.5, 0)
+				Position = UDim2.new(1 - CurrentTransparency, 0, 0.5, 0)
 			})
 
 			Fatality:CreateAnimation(ColorPickerFrame,0.45,{
@@ -2932,26 +2933,16 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 				IsPressM1 = true;
 
 				while (UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or IsPressM1) do task.wait()
-					local tone = math.clamp((((Mouse.X) - ColorOpc.AbsolutePosition.X) / ColorOpc.AbsoluteSize.X), 0, 1);
-					CodeV = tone;
+					local t = math.clamp((((Mouse.X) - ColorOpc.AbsolutePosition.X) / ColorOpc.AbsoluteSize.X), 0, 1);
+					CurrentTransparency = 1 - t;
 
 					Fatality:CreateAnimation(ColorOptSlide,0.35,{
-						Position = UDim2.new(tone, 0, 0.5, 0)
-					});
-					
-					Fatality:CreateAnimation(MouseMovement,0.2,nil,{
-						Position = UDim2.new(CodeH, 0, 1 - CodeV, 0)
+						Position = UDim2.new(t, 0, 0.5, 0)
 					});
 
-					local newCol = Color3.fromHSV(OldCode, CodeH, CodeV);
-					Fatality:CreateAnimation(ColorBox,0.5,{
-						BackgroundColor3 = newCol
-					});
-					Fatality:CreateAnimation(ColorOpc,0.35,{
-						BackgroundColor3 = newCol
-					});
-					HexCodeText.Text = "#" .. tostring(newCol:ToHex());
-					Callback(newCol);
+					ColorBox.BackgroundTransparency = CurrentTransparency;
+					HexCodeText.Text = "#" .. tostring(ColorBox.BackgroundColor3:ToHex());
+					Callback(Color3.fromHSV(OldCode, CodeH, CodeV), CurrentTransparency);
 				end;
 			end;
 		end);
@@ -2970,10 +2961,6 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 					CodeH = (Value - PosX) / (ScaleX - PosX);
 					CodeV = (1 - ((Vals - PosY) / (ScaleY - PosY)));
 
-					Fatality:CreateAnimation(ColorOptSlide,0.35,{
-						Position = UDim2.new(CodeV, 0, 0.5, 0)
-					});
-
 					local newCol = Color3.fromHSV(OldCode, CodeH, CodeV);
 
 					Fatality:CreateAnimation(ColorBox,0.5,{
@@ -2990,7 +2977,8 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 						Position = UDim2.new(CodeH, 0, 1 - CodeV, 0)
 					})
 
-					Callback(newCol);
+					ColorBox.BackgroundTransparency = CurrentTransparency;
+					Callback(newCol, CurrentTransparency);
 				end
 			end
 		end)
@@ -2999,6 +2987,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	return {
 		set_opc = function(v)
 			Transparency = v;
+			CurrentTransparency = v;
 		end,
 	}
 end;
