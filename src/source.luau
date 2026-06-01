@@ -2350,7 +2350,7 @@ function Fatality:CreateOption(OptionButton: ImageButton, ParentFrame: Frame): E
 
 	UserInputService.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-			if not Fatality:IsMouseOverFrame(ExtElementFrame) and not Fatality.GLOBAL_ENVIRONMENT.IS_HOLD_COLOR_PICKER then
+			if Bindable:GetAttribute('V') and not Fatality:IsMouseOverFrame(ExtElementFrame) and not Fatality.GLOBAL_ENVIRONMENT.IS_HOLD_COLOR_PICKER then
 				ToggleExt(false);
 			end;
 		end;
@@ -2891,7 +2891,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 
 		UserInputService.InputBegan:Connect(function(Input)
 			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-				if not Fatality:IsMouseOverFrame(ColorPickerFrame) then
+				if IsOpen and not Fatality:IsMouseOverFrame(ColorPickerFrame) then
 					VisibleToggle(false);
 				end;
 			end;
@@ -3322,7 +3322,7 @@ function Fatality:CreateDropdown(Parent: Frame, Default: string | {[string]: boo
 
 	UserInputService.InputBegan:Connect(function(Input)
 		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-			if not Fatality:IsMouseOverFrame(DropdownItemFrame) and not Fatality:IsMouseOverFrame(Parent) then
+			if IsDropdownOpen and not Fatality:IsMouseOverFrame(DropdownItemFrame) and not Fatality:IsMouseOverFrame(Parent) then
 				func(false);
 				Toggle(false);
 				IsDropdownOpen = false;
@@ -7645,7 +7645,7 @@ function Fatality.new(Window: Window)
 
 		UserInputService.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				if not Fatality:IsMouseOverFrame(SearchFrame) then
+				if SearchFrame.Size.X.Offset > 0 and not Fatality:IsMouseOverFrame(SearchFrame) then
 					SearchToggle(false);
 				end
 			end
