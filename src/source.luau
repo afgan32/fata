@@ -476,7 +476,7 @@ function Fatality:SetSectionPadding(p)
 	end;
 end;
 Fatality.Version = '1.6';
-Fatality.UpdateVersion = 4;
+Fatality.UpdateVersion = 5;
 
 function Fatality:PrintUpdateVersion()
 	print("Fatality Update: " .. tostring(self.UpdateVersion))
