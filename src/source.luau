@@ -365,6 +365,11 @@ function Fatality:SetSectionColumnWidth(scale)
 			cols.R.Size = UDim2.new(scale, 0, cols.R.Size.Y.Scale, cols.R.Size.Y.Offset);
 		end;
 	end;
+	if Fatality._SubTabReposition then
+		for _, repoFunc in ipairs(Fatality._SubTabReposition) do
+			repoFunc();
+		end;
+	end;
 end;
 
 function Fatality:SetSectionNameYOffset(y)
