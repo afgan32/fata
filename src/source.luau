@@ -476,7 +476,7 @@ function Fatality:SetSectionPadding(p)
 	end;
 end;
 Fatality.Version = '1.6';
-Fatality.UpdateVersion = 5;
+Fatality.UpdateVersion = 4;
 
 function Fatality:PrintUpdateVersion()
 	print("Fatality Update: " .. tostring(self.UpdateVersion))
@@ -2392,7 +2392,6 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	local CodeH,CodeV = 1, 1;
 	local IsPressM1 = false;
 	local UI_SPAWN_THREAD;
-	local CurrentTransparency = Transparency or 0;
 
 	local updateColor = function()
 		local H , S , V = ColorBox.BackgroundColor3:ToHSV();
@@ -2807,7 +2806,6 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 			local h,s,v = Fatality.GLOBAL_ENVIRONMENT.COLOR_COPY.RGB:ToHSV();
 
 			Transparency = Fatality.GLOBAL_ENVIRONMENT.COLOR_COPY.OPC;
-			CurrentTransparency = Transparency;
 
 			OldCode = h;
 			CodeH = s;
@@ -2824,7 +2822,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 			})
 
 			Fatality:CreateAnimation(ColorOptSlide,0.35,{
-				Position = UDim2.new(1 - CurrentTransparency, 0, 0.5, 0)
+				Position = UDim2.new(CodeV, 0, 0.5, 0)
 			})
 
 			Fatality:CreateAnimation(ColorPickerFrame,0.45,{
@@ -2835,15 +2833,14 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 
 			ColorOpc.BackgroundColor3 = Fatality.GLOBAL_ENVIRONMENT.COLOR_COPY.RGB;
 
-			ColorBox.BackgroundTransparency = CurrentTransparency;
-			Callback(Color3.fromHSV(OldCode,CodeH,CodeV), CurrentTransparency);
+			Callback(Color3.fromHSV(OldCode,CodeH,CodeV));
 		end;
 	end);
 
 	CopyButton.MouseButton1Click:Connect(function()
 		Fatality.GLOBAL_ENVIRONMENT.COLOR_COPY = {
 			RGB = Color3.fromHSV(OldCode,CodeH,CodeV),
-			OPC = CurrentTransparency,
+			OPC = Transparency,
 		};
 	end)
 
@@ -2868,8 +2865,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 
 				SPAWN_THREAD = task.spawn(function()
 					while IsPressM1 do task.wait(0)
-						ColorBox.BackgroundTransparency = CurrentTransparency;
-						Callback(Color3.fromHSV(OldCode,CodeH,CodeV), CurrentTransparency);
+						Callback(Color3.fromHSV(OldCode,CodeH,CodeV));
 					end;
 				end);
 			end;
@@ -2926,8 +2922,7 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 					HexCodeText.Text = "#" .. tostring(Color:ToHex())
 
 					OldCode = Code;
-					ColorBox.BackgroundTransparency = CurrentTransparency;
-					Callback(Color, CurrentTransparency);
+					Callback(Color);
 				end;
 			end;
 		end);
@@ -2937,18 +2932,26 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 				IsPressM1 = true;
 
 				while (UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or IsPressM1) do task.wait()
-					local transparency = math.clamp((((Mouse.X) - ColorOpc.AbsolutePosition.X) / ColorOpc.AbsoluteSize.X), 0, 1);
+					local tone = math.clamp((((Mouse.X) - ColorOpc.AbsolutePosition.X) / ColorOpc.AbsoluteSize.X), 0, 1);
+					CodeV = tone;
 
 					Fatality:CreateAnimation(ColorOptSlide,0.35,{
-						Position = UDim2.new(transparency, 0, 0.5, 0)
+						Position = UDim2.new(tone, 0, 0.5, 0)
+					});
+					
+					Fatality:CreateAnimation(MouseMovement,0.2,nil,{
+						Position = UDim2.new(CodeH, 0, 1 - CodeV, 0)
 					});
 
-					HexCodeText.Text = "#" .. tostring(ColorBox.BackgroundColor3:ToHex())
-
-					CurrentTransparency = (1 - transparency);
-					Transparency = CurrentTransparency;
-					ColorBox.BackgroundTransparency = CurrentTransparency;
-					Callback(ColorBox.BackgroundColor3, CurrentTransparency);
+					local newCol = Color3.fromHSV(OldCode, CodeH, CodeV);
+					Fatality:CreateAnimation(ColorBox,0.5,{
+						BackgroundColor3 = newCol
+					});
+					Fatality:CreateAnimation(ColorOpc,0.35,{
+						BackgroundColor3 = newCol
+					});
+					HexCodeText.Text = "#" .. tostring(newCol:ToHex());
+					Callback(newCol);
 				end;
 			end;
 		end);
@@ -2967,22 +2970,27 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 					CodeH = (Value - PosX) / (ScaleX - PosX);
 					CodeV = (1 - ((Vals - PosY) / (ScaleY - PosY)));
 
+					Fatality:CreateAnimation(ColorOptSlide,0.35,{
+						Position = UDim2.new(CodeV, 0, 0.5, 0)
+					});
+
+					local newCol = Color3.fromHSV(OldCode, CodeH, CodeV);
+
 					Fatality:CreateAnimation(ColorBox,0.5,{
-						BackgroundColor3 = Color3.fromHSV(OldCode, CodeH, CodeV)
+						BackgroundColor3 = newCol
 					});
 
 					Fatality:CreateAnimation(ColorOpc,0.35,{
-						BackgroundColor3 = Color3.fromHSV(OldCode, CodeH, CodeV)
+						BackgroundColor3 = newCol
 					});
 
-					HexCodeText.Text = "#" .. tostring(Color3.fromHSV(OldCode, CodeH, CodeV):ToHex())
+					HexCodeText.Text = "#" .. tostring(newCol:ToHex())
 
 					Fatality:CreateAnimation(MouseMovement,0.2,nil,{
 						Position = UDim2.new(CodeH, 0, 1 - CodeV, 0)
 					})
 
-					ColorBox.BackgroundTransparency = CurrentTransparency;
-					Callback(Color3.fromHSV(OldCode, CodeH, CodeV), CurrentTransparency);
+					Callback(newCol);
 				end
 			end
 		end)
@@ -2991,7 +2999,6 @@ function Fatality:CreateColorPicker(ColorBox: Frame,Transparency, Callback)
 	return {
 		set_opc = function(v)
 			Transparency = v;
-			CurrentTransparency = v;
 		end,
 	}
 end;
