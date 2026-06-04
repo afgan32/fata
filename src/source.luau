@@ -1366,8 +1366,39 @@ function Fatality:CreateHover(Element : Frame,Callback : (boolean) -> any)
 	end);
 end;
 
+function Fatality:ToContentId(value) : string
+	if typeof(value) == "string" then
+		if value == "" then
+			return ""
+		end
+		if value:match("^%d+$") then
+			return "rbxassetid://" .. value
+		end
+		return value
+	end
+
+	if typeof(value) == "number" then
+		return "rbxassetid://" .. tostring(value)
+	end
+
+	if typeof(value) == "Instance" then
+		if value:IsA("Decal") or value:IsA("Texture") then
+			return value.Texture or ""
+		end
+		if value:IsA("ImageLabel") or value:IsA("ImageButton") then
+			return value.Image or ""
+		end
+		if value:IsA("StringValue") then
+			return value.Value or ""
+		end
+	end
+
+	return ""
+end;
+
 function Fatality:GetIcon(name : string) : string
-	local icon = Fatality.Lucide['lucide-'..tostring(name)] or Fatality.Lucide[name] or Fatality.Lucide[tostring(name)] or "";
+	local icon = Fatality.Lucide['lucide-'..tostring(name)] or Fatality.Lucide[name] or Fatality.Lucide[tostring(name)] or name or "";
+	icon = Fatality:ToContentId(icon);
 	if icon:find("rbxassetid://") then
 		local id = icon:match("%d+")
 		if id then
@@ -1378,7 +1409,7 @@ function Fatality:GetIcon(name : string) : string
 end;
 
 function Fatality:SetIcon(name : string, value : string)
-	Fatality.Lucide[name] = value;
+	Fatality.Lucide[name] = Fatality:ToContentId(value);
 end;
 
 function Fatality:Rounding(num: number, numDecimalPlaces: number) : number
@@ -5851,7 +5882,7 @@ function Fatality.new(Window: Window)
 	end;
 
 	function Fatal:SetProfile(icon: string)
-		UserIcon.Image = icon or Players:GetUserThumbnailAsync(Client.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size180x180);
+		UserIcon.Image = (Fatality:ToContentId(icon) ~= "" and Fatality:ToContentId(icon)) or Players:GetUserThumbnailAsync(Client.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size180x180);
 	end;
 
 	function Fatal:SetExpire(str: string)
