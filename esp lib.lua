@@ -288,14 +288,21 @@ local ESPConfig = {
         Font = "Smallest Pixel-7",
         TextSize = 9,
         Options = {
-            Idle = false,
             Moving = false,
+            Vehicle = false,
+            LowHP = false,
+            Weapon = false,
             Jumping = false,
             Swimming = false,
+            Idle = false,
         },
+        LowHPThreshold = 35,
         Colors = {
-            Idle = Color3.fromRGB(255, 255, 255),
             Moving = Color3.fromRGB(255, 255, 255),
+            Vehicle = Color3.fromRGB(150, 190, 255),
+            LowHP = Color3.fromRGB(255, 80, 80),
+            Weapon = Color3.fromRGB(255, 255, 255),
+            Idle = Color3.fromRGB(255, 255, 255),
             Jumping = Color3.fromRGB(255, 255, 255),
             Swimming = Color3.fromRGB(65, 65, 255),
         }
@@ -1917,14 +1924,14 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
                 espObj.HealthText.Size = UDim2.new(0, 0, 0, 0)
 
                 if hpTextFollowBar then
-                    espObj.HealthText.Position = UDim2.new(0, barLeftX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (hpWidth / 2) + 1 + (GetCfg("HealthBar.TextOffsetY") or 0))
+                    espObj.HealthText.Position = UDim2.new(0, barLeftX + hpOffsetX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (hpWidth / 2) + 1 + (GetCfg("HealthBar.TextOffsetY") or 0))
                 else
-                    espObj.HealthText.Position = UDim2.new(0, x + sx + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (hpWidth / 2) + 1 + (GetCfg("HealthBar.TextOffsetY") or 0))
+                    espObj.HealthText.Position = UDim2.new(0, x + sx + hpOffsetX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (hpWidth / 2) + 1 + (GetCfg("HealthBar.TextOffsetY") or 0))
                 end
             else
                 local barHeight = math.floor((sy + 1) * healthPercent)
                 local barOutlineX = espObj.HealthBarOutline.Position.X.Offset
-                local barTopY = y + (sy + 1) - barHeight
+                local barTopY = y + hpOffsetY + (sy + 1) - barHeight
 
                 espObj.HealthText.TextXAlignment = hpPos == "Left" and Enum.TextXAlignment.Right or
                     Enum.TextXAlignment.Left
@@ -1949,11 +1956,33 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
             local isMoving = humanoid.MoveDirection.Magnitude > 0
             local isJumping = (state == Enum.HumanoidStateType.Jumping or state == Enum.HumanoidStateType.FallingDown or state == Enum.HumanoidStateType.Freefall)
             local isSwimming = state == Enum.HumanoidStateType.Swimming
+            local isVehicle = humanoid.SeatPart ~= nil
+            local isLowHP = healthPercent <= ((GetCfg("Flags.LowHPThreshold") or 35) / 100)
+            local weaponFlagName = nil
+            local holdingFlag = instance:FindFirstChild("Holding")
+            if holdingFlag then
+                if holdingFlag:IsA("ValueBase") then
+                    if holdingFlag.Value then weaponFlagName = tostring(holdingFlag.Value) end
+                else
+                    weaponFlagName = holdingFlag.Name
+                end
+            end
+            if (not weaponFlagName or weaponFlagName == "" or weaponFlagName == "nil") then
+                local toolFlag = instance:FindFirstChildWhichIsA("Tool")
+                if toolFlag then weaponFlagName = toolFlag.Name end
+            end
+
             local flagOptionsMoving = GetCfg("Flags.Options.Moving")
+            local flagOptionsVehicle = GetCfg("Flags.Options.Vehicle")
+            local flagOptionsLowHP = GetCfg("Flags.Options.LowHP")
+            local flagOptionsWeapon = GetCfg("Flags.Options.Weapon")
             local flagOptionsJumping = GetCfg("Flags.Options.Jumping")
             local flagOptionsSwimming = GetCfg("Flags.Options.Swimming")
             local flagOptionsIdle = GetCfg("Flags.Options.Idle")
             local flagColorsMoving = GetCfg("Flags.Colors.Moving")
+            local flagColorsVehicle = GetCfg("Flags.Colors.Vehicle")
+            local flagColorsLowHP = GetCfg("Flags.Colors.LowHP")
+            local flagColorsWeapon = GetCfg("Flags.Colors.Weapon")
             local flagColorsJumping = GetCfg("Flags.Colors.Jumping")
             local flagColorsSwimming = GetCfg("Flags.Colors.Swimming")
             local flagColorsIdle = GetCfg("Flags.Colors.Idle")
@@ -1965,15 +1994,25 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
             local flagPosition = GetCfg("Flags.Position")
             local flags = {}
 
-            if isMoving and isJumping and flagOptionsMoving and flagOptionsJumping then
-                table.insert(flags, { text = "Moving & Jumping", color = flagColorsMoving })
-            elseif isJumping and flagOptionsJumping then
-                table.insert(flags, { text = "Jumping", color = flagColorsJumping })
-            elseif isMoving and flagOptionsMoving then
+            if isMoving and flagOptionsMoving then
                 table.insert(flags, { text = "Moving", color = flagColorsMoving })
-            elseif isSwimming and flagOptionsSwimming then
+            end
+            if isVehicle and flagOptionsVehicle then
+                table.insert(flags, { text = "Vehicle", color = flagColorsVehicle })
+            end
+            if isLowHP and flagOptionsLowHP then
+                table.insert(flags, { text = "Low HP", color = flagColorsLowHP })
+            end
+            if weaponFlagName and weaponFlagName ~= "" and weaponFlagName ~= "nil" and flagOptionsWeapon then
+                table.insert(flags, { text = weaponFlagName, color = flagColorsWeapon })
+            end
+            if isJumping and flagOptionsJumping then
+                table.insert(flags, { text = "Jumping", color = flagColorsJumping })
+            end
+            if isSwimming and flagOptionsSwimming then
                 table.insert(flags, { text = "Swimming", color = flagColorsSwimming })
-            elseif flagOptionsIdle then
+            end
+            if (not isMoving and not isJumping and not isSwimming and not isVehicle) and flagOptionsIdle then
                 table.insert(flags, { text = "Idle", color = flagColorsIdle })
             end
 
