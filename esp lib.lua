@@ -1891,7 +1891,8 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
                 end
             end
         else
-            espObj.HealthBar.BackgroundColor3 = healthColor
+            espObj.HealthGradient.Enabled = false
+            espObj.HealthBar.BackgroundColor3 = GetCfg("HealthBar.Color") or healthColor
         end
 
         if showText then
@@ -1930,7 +1931,7 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
                 espObj.HealthText.Size = UDim2.new(0, 0, 0, 0)
 
                 local textX = hpPos == "Left" and (barOutlineX - 2) or (barOutlineX + hpWidth + 4)
-                local textY = hpTextFollowBar and barTopY or y
+                local textY = hpTextFollowBar and barTopY or (y + hpOffsetY)
                 espObj.HealthText.Position = UDim2.new(0, textX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (GetCfg("HealthBar.TextOffsetY") or 0))
             end
         else
