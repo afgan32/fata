@@ -219,7 +219,12 @@ local ESPConfig = {
         Position = "Left", -- "Left", "Right", "Top", "Bottom"
         SideGap = 2,
         Width = 2,
+        OffsetX = 0,
+        OffsetY = 0,
         ShowText = false,
+        TextColor = Color3.fromRGB(255, 255, 255),
+        TextOffsetX = 0,
+        TextOffsetY = 0,
         TextFollowBar = false,
         HideWhenFullHP = false,
         FollowGradientColorText = false,
@@ -307,6 +312,23 @@ local ESPConfig = {
             Color1 = Color3.fromRGB(255, 255, 255),
             Color2 = Color3.fromRGB(100, 200, 255),
         },
+    },
+
+    -- head circle
+    HeadCircle = {
+        Enabled = false,
+        Color = Color3.fromRGB(255, 255, 255),
+        Thickness = 1,
+        Filled = false,
+        Sides = 16,
+    },
+
+    -- look vector
+    LookVector = {
+        Enabled = false,
+        Color = Color3.fromRGB(255, 255, 0),
+        Length = 10,
+        Thickness = 1,
     },
 
     -- off-screen arrows
@@ -958,6 +980,25 @@ local CreateESPObj = LPHNoVirtualize(function(name)
         espObj.Bones[i] = bone
     end
 
+    espObj.HeadCircle = Instance.new("Frame")
+    espObj.HeadCircle.BackgroundTransparency = 1
+    espObj.HeadCircle.BorderSizePixel = 0
+    espObj.HeadCircle.Visible = false
+    espObj.HeadCircle.ZIndex = 2
+    espObj.HeadCircle.Parent = container
+    local headCorner = Instance.new("UICorner")
+    headCorner.CornerRadius = UDim.new(1, 0)
+    headCorner.Parent = espObj.HeadCircle
+    espObj.HeadCircleStroke = Instance.new("UIStroke")
+    espObj.HeadCircleStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    espObj.HeadCircleStroke.Parent = espObj.HeadCircle
+
+    espObj.LookVectorLine = Instance.new("Frame")
+    espObj.LookVectorLine.BorderSizePixel = 0
+    espObj.LookVectorLine.Visible = false
+    espObj.LookVectorLine.ZIndex = 2
+    espObj.LookVectorLine.Parent = container
+
     local arrowInner = Instance.new("TextLabel")
     arrowInner.BackgroundTransparency = 1
     arrowInner.Text = "▲"
@@ -1011,6 +1052,8 @@ local CreateESPObj = LPHNoVirtualize(function(name)
         if espObj.ArrowOutline then espObj.ArrowOutline:Destroy() end
         if espObj.ArrowName then espObj.ArrowName:Destroy() end
         if espObj.ArrowDist then espObj.ArrowDist:Destroy() end
+        if espObj.HeadCircle then espObj.HeadCircle:Destroy() end
+        if espObj.LookVectorLine then espObj.LookVectorLine:Destroy() end
     end
 
     return espObj
@@ -1778,8 +1821,10 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
         local hpOutlineStyle = GetCfg("HealthBar.Outline.Style")
         -- Backward compat: if Enabled is explicitly false, treat as None
         if GetCfg("HealthBar.Outline.Enabled") == false then hpOutlineStyle = "None" end
-        espObj.HealthBarOutline.Visible = hpOutlineStyle ~= "None"
-        espObj.HealthBarOutline.BackgroundTransparency = 0
+        local hpOffsetX = GetCfg("HealthBar.OffsetX") or 0
+        local hpOffsetY = GetCfg("HealthBar.OffsetY") or 0
+        espObj.HealthBarOutline.Visible = true
+        espObj.HealthBarOutline.BackgroundTransparency = (hpOutlineStyle ~= "None") and 0 or 1
         espObj.HealthBarOutline.BackgroundColor3 = GetCfg("HealthBar.Outline.Color")
         local barWidth
 
@@ -1788,10 +1833,10 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
             espObj.HealthBarOutline.Size = UDim2.new(0, sx + 3, 0, hpWidth + 2)
 
             if hpPos == "Top" then
-                espObj.HealthBarOutline.Position = UDim2.new(0, x - 1, 0,
-                    y - o - hpSideGap - hpWidth - 1)
+                espObj.HealthBarOutline.Position = UDim2.new(0, x - 1 + hpOffsetX, 0,
+                    y - o - hpSideGap - hpWidth - 1 + hpOffsetY)
             else -- Bottom
-                espObj.HealthBarOutline.Position = UDim2.new(0, x - 1, 0, y + sy + o + hpSideGap)
+                espObj.HealthBarOutline.Position = UDim2.new(0, x - 1 + hpOffsetX, 0, y + sy + o + hpSideGap + hpOffsetY)
             end
 
             espObj.HealthBarContainer.Size = UDim2.new(0, barWidth, 0, hpWidth)
@@ -1805,9 +1850,9 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
 
             if hpPos == "Left" then
                 espObj.HealthBarOutline.Position = UDim2.new(0,
-                    x - o - hpSideGap - hpWidth - 1, 0, y - 1)
+                    x - o - hpSideGap - hpWidth - 1 + hpOffsetX, 0, y - 1 + hpOffsetY)
             else -- Right
-                espObj.HealthBarOutline.Position = UDim2.new(0, x + sx + o + hpSideGap, 0, y - 1)
+                espObj.HealthBarOutline.Position = UDim2.new(0, x + sx + o + hpSideGap + hpOffsetX, 0, y - 1 + hpOffsetY)
             end
 
             espObj.HealthBarContainer.Size = UDim2.new(0, hpWidth, 0, barHeight)
@@ -1826,8 +1871,14 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
         local followColorText = showText and GetCfg("HealthBar.FollowGradientColorText")
         local healthColor = Color3.fromHSV(healthPercent * 0.3, 1, 1)
 
-        if gradientEnabled and not isHorizontal then
-            espObj.HealthGradient.Rotation = 90
+        espObj.HealthGradient.Enabled = gradientEnabled
+        if gradientEnabled then
+            espObj.HealthGradient.Rotation = isHorizontal and 0 or 90
+            espObj.HealthGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, GetCfg("HealthBar.Gradient.Color1")),
+                ColorSequenceKeypoint.new(0.5, GetCfg("HealthBar.Gradient.Color2")),
+                ColorSequenceKeypoint.new(1, GetCfg("HealthBar.Gradient.Color3"))
+            })
             espObj.HealthBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 
             if followColorText then
@@ -1853,7 +1904,7 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
             if ESPFonts.Loaded[hpFont] then
                 espObj.HealthText.FontFace = ESPFonts.Loaded[hpFont]
             end
-            espObj.HealthText.TextColor3 = followColorText and healthColor or GetCfg("TextColor")
+            espObj.HealthText.TextColor3 = followColorText and healthColor or (GetCfg("HealthBar.TextColor") or GetCfg("TextColor"))
             ApplyTextOutline(espObj.HealthText, hpOutlineStyle, textOutlineColor)
 
             if isHorizontal then
@@ -1865,9 +1916,9 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
                 espObj.HealthText.Size = UDim2.new(0, 0, 0, 0)
 
                 if hpTextFollowBar then
-                    espObj.HealthText.Position = UDim2.new(0, barLeftX, 0, textY + (hpWidth / 2) + 1)
+                    espObj.HealthText.Position = UDim2.new(0, barLeftX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (hpWidth / 2) + 1 + (GetCfg("HealthBar.TextOffsetY") or 0))
                 else
-                    espObj.HealthText.Position = UDim2.new(0, x + sx, 0, textY + (hpWidth / 2) + 1)
+                    espObj.HealthText.Position = UDim2.new(0, x + sx + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (hpWidth / 2) + 1 + (GetCfg("HealthBar.TextOffsetY") or 0))
                 end
             else
                 local barHeight = math.floor((sy + 1) * healthPercent)
@@ -1880,7 +1931,7 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
 
                 local textX = hpPos == "Left" and (barOutlineX - 2) or (barOutlineX + hpWidth + 4)
                 local textY = hpTextFollowBar and barTopY or y
-                espObj.HealthText.Position = UDim2.new(0, textX, 0, textY)
+                espObj.HealthText.Position = UDim2.new(0, textX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (GetCfg("HealthBar.TextOffsetY") or 0))
             end
         else
             espObj.HealthText.Visible = false
@@ -1996,6 +2047,51 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
             for _, b in ipairs(espObj.Bones) do b.Visible = false end
             for _, b in ipairs(espObj.BoneOutlines) do b.Visible = false end
         end
+    end
+
+    -- Head circle logic
+    if GetCfg("HeadCircle.Enabled") and instance:IsA("Model") then
+        local head = instance:FindFirstChild("Head")
+        if head and head:IsA("BasePart") then
+            local center, centerOn = WtS(Camera, head.Position)
+            local edge = Camera:WorldToViewportPoint(head.Position + Camera.CFrame.RightVector * (head.Size.X * 0.5))
+            local radius = math.max(2, math.abs(edge.X - center.X))
+            if centerOn then
+                espObj.HeadCircle.Visible = true
+                espObj.HeadCircle.Position = UDim2.new(0, center.X - radius, 0, center.Y - radius)
+                espObj.HeadCircle.Size = UDim2.new(0, radius * 2, 0, radius * 2)
+                espObj.HeadCircle.BackgroundColor3 = GetCfg("HeadCircle.Color")
+                espObj.HeadCircle.BackgroundTransparency = GetCfg("HeadCircle.Filled") and 0.75 or 1
+                espObj.HeadCircleStroke.Color = GetCfg("HeadCircle.Color")
+                espObj.HeadCircleStroke.Thickness = GetCfg("HeadCircle.Thickness") or 1
+            else
+                espObj.HeadCircle.Visible = false
+            end
+        else
+            espObj.HeadCircle.Visible = false
+        end
+    elseif espObj.HeadCircle then
+        espObj.HeadCircle.Visible = false
+    end
+
+    -- Look vector logic
+    if GetCfg("LookVector.Enabled") and instance:IsA("Model") then
+        local root = instance:FindFirstChild("HumanoidRootPart") or instance.PrimaryPart
+        if root and root:IsA("BasePart") then
+            local start3 = root.Position
+            local end3 = start3 + root.CFrame.LookVector * (GetCfg("LookVector.Length") or 10)
+            local s2, sOn = WtS(Camera, start3)
+            local e2, eOn = WtS(Camera, end3)
+            if sOn and eOn then
+                DrawLine(espObj.LookVectorLine, Vector2.new(s2.X, s2.Y), Vector2.new(e2.X, e2.Y), GetCfg("LookVector.Thickness") or 1, GetCfg("LookVector.Color"))
+            else
+                espObj.LookVectorLine.Visible = false
+            end
+        else
+            espObj.LookVectorLine.Visible = false
+        end
+    elseif espObj.LookVectorLine then
+        espObj.LookVectorLine.Visible = false
     end
 end)
 --
@@ -2277,6 +2373,16 @@ local ScanDirectories = LPHNoVirtualize(function()
     end
 end)
 
+
+local function GetDistanceOrigin()
+    local char = LocalPlayer and LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if hrp and hrp:IsA("BasePart") then
+        return hrp.Position
+    end
+    return Camera.CFrame.Position
+end
+
 local lastScan = 0
 local lastRender = 0
 local lastFontRetry = 0
@@ -2331,7 +2437,7 @@ local function RuntimeStep()
 
         if rootPart then
             local onscreen, pos2d, size2d = Get2DBoundingBox(inst)
-            local distanceStuds = (Camera.CFrame.Position - rootPart.Position).Magnitude
+            local distanceStuds = (GetDistanceOrigin() - rootPart.Position).Magnitude
             UpdateESPObj(data.espObj, pos2d, size2d, data.name, distanceStuds, inst, data.Cheap, data.NonHuman,
                 data.NoStatus, data.Config, onscreen)
         else
