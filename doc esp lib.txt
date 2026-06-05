@@ -1,0 +1,257 @@
+
+##  Initialization
+To load the library, fetch it via `game:HttpGet` and call it.
+```lua
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/rthusrtghdfhtyjkehrfh/sensoryESP/refs/heads/main/ESP.lua"))()
+```
+
+##  Core Methods
+
+### `ESP:Load(config: table)`
+Initializes and starts the ESP with the provided configuration table. It performs a deep merge with the default configuration.
+*   **Returns:** `self` (Allows chaining)
+*   **Note:** Calling `:Load()` while the ESP is already running will safely `Unload()` the previous instance first.
+
+### `ESP:Unload()`
+Completely destroys all ESP instances, drawings, highlights, connections, and loops. Leaves no artifacts in `CoreGui` or `Workspace`.
+*   **Global Fallback:** `getgenv().SensoryESP_Unload()` is also available globally for fail-safe teardown.
+
+### `ESP:GetConfig()`
+Returns the live, deeply-merged configuration table currently in use.
+*   **Returns:** `table` (You can mutate this table at runtime to update settings dynamically, e.g., `ESP:GetConfig().Enabled = false`).
+
+---
+
+##  Configuration Schema (Type Definitions)
+When calling `ESP:Load(config)`, use the following structure. All keys are **optional**; omitted keys will fall back to their default values.
+
+```lua
+local ConfigSchema = {
+    -- [GLOBAL SETTINGS]
+    Enabled = boolean,           -- Master switch
+    Players = boolean,           -- Track Players
+    LocalPlayer = boolean,       -- Render ESP on the LocalPlayer
+    LimitFPS = number,           -- Render cap (Set to 0 for unlimited)
+    DynamicBoxes = boolean,      -- True: box wraps the whole model. False: box wraps HumanoidRootPart
+    DynamicBoxesCheap = boolean, -- Optimizes DynamicBoxes (tracks only main parts)
+    DynamicBoxesIncludeAll = boolean, -- Tracks ALL BaseParts for the bounding box
+    VisibilityCheckRate = number,-- Rate in seconds to raycast for vis-checks (Adornments)
+    
+    Keybind = {
+        Enabled = boolean,
+        Key = Enum.KeyCode,      -- e.g., Enum.KeyCode.Insert
+    },
+
+    -- [BOXES]
+    Boxes = boolean,
+    BoxType = "Normal" | "Corner" | "Circle",
+    BoxColor = Color3,
+    BoxThickness = number,
+    Outlines = {
+        Style = "Full" | "None",
+        Color = Color3,
+        Thickness = number,
+    },
+
+    -- [BOX FILL / BACKGROUND]
+    BoxFill = {
+        Enabled = boolean,
+        Color = Color3,
+        Transparency = number, -- 0 to 1
+        Gradient = {
+            Enabled = boolean,
+            Color1 = Color3, Color2 = Color3, Color3 = Color3,
+            Rotation = number,     -- 0 to 360
+            Animated = boolean,
+            Speed = number,        -- Degrees per second
+            Direction = "Right" | "Left",
+        }
+    },
+
+    -- [NAMES & TEXT GLOBALS]
+    Names = boolean,
+    TextSize = number,
+    TextColor = Color3,
+    TextOutline = boolean,
+    TextOutlineStyle = "Full" | "Shadow" | "None",
+    TextGap = number,
+    Font = "Proggy Clean" | "Smallest Pixel-7" | "Tahoma" | "Minecraftia" | "Tahoma Modern Bold",
+
+    -- [HEALTH BAR]
+    HealthBar = {
+        Enabled = boolean,
+        Position = "Left" | "Right" | "Top" | "Bottom",
+        SideGap = number,
+        Width = number,
+        ShowText = boolean,           -- Render HP numeric value
+        TextFollowBar = boolean,      -- Text moves with HP level
+        HideWhenFullHP = boolean,
+        FollowGradientColorText = boolean, -- Text color matches gradient
+        Font = string,                -- See Fonts above
+        TextSize = number,
+        Outline = { Style = "Full" | "None", Color = Color3 },
+        Gradient = {
+            Enabled = boolean,
+            Color1 = Color3, Color2 = Color3, Color3 = Color3,
+        }
+    },
+
+    -- [DISTANCE]
+    Distance = {
+        Enabled = boolean,
+        Unit = "Meters" | "Studs",
+        StudsPerMeter = number,       -- Used if Unit is "Meters"
+        Ending = string,              -- Suffix (e.g. "m")
+        Gap = number,
+        OutlineStyle = "Full" | "None",
+        Font = string, TextSize = number, Color = Color3,
+    },
+
+    -- [WEAPON / TOOL]
+    Weapon = {
+        Enabled = boolean,
+        UseToolFallback = boolean,    -- Search for 'Tool' class if 'Holding' value is missing
+        InventoryPath = string,
+        Gap = number, Font = string, TextSize = number, Color = Color3, OutlineStyle = string,
+    },
+
+    -- [FLAGS (State Indicators)]
+    Flags = {
+        Enabled = boolean,
+        Position = "Right" | "Left",
+        Gap = number, SideGap = number, TextGap = number,
+        OutlineStyle = string, Font = string, TextSize = number,
+        Options = {
+            Idle = boolean, Moving = boolean, Jumping = boolean, Swimming = boolean,
+        },
+        Colors = {
+            Idle = Color3, Moving = Color3, Jumping = Color3, Swimming = Color3,
+        }
+    },
+
+    -- [CHAMS]
+    Chams = {
+        Enabled = boolean,
+        Type = "MeshChams" | "Highlight" | "Adornment",
+        -- 'MeshChams' creates a welded false-shell over R6/R15 limbs. Best for players.
+        -- 'Highlight' uses standard Roblox instances.
+        -- 'Adornment' creates BoxHandleAdornments on every part.
+        
+        Highlight = { FillColor = Color3, FillTransparency = number, OutlineColor = Color3, OutlineTransparency = number, VisibleCheck = boolean },
+        Adornment = { Color = Color3, VisibleColor = Color3, Transparency = number, AlwaysOnTop = boolean, VisibleCheck = boolean },
+        MeshChams = { FillColor = Color3, FillTransparency = number, OutlineColor = Color3, OutlineTransparency = number, VisibleCheck = boolean },
+    },
+
+    -- [OFF-SCREEN ARROWS]
+    OffScreenArrows = {
+        Enabled = boolean,
+        Size = number,
+        Color = Color3,
+        OrbitRadius = number,         -- Distance from screen center
+        ArrowMode = "Camera" | "Compass", 
+        Outline = boolean, OutlineColor = Color3,
+        Names = { Enabled = boolean, Font = string, TextSize = number, Color = Color3, Outline = boolean, Side = "Bottom"|"Top"|"Left"|"Right", Gap = number },
+        Distance = { Enabled = boolean, Font = string, TextSize = number, Color = Color3, Outline = boolean, Side = "Bottom", Gap = number },
+    },
+
+    -- [TEAM / FRIEND INDICATORS]
+    TeamIndicator = {
+        Enabled = boolean,
+        Position = "Right" | "Left",
+        UseTeamColor = boolean, Color = Color3,
+        Compact = boolean,            -- Shortens "Red Team" to "RT"
+        TextSize = number,
+    },
+    FriendlyIndicator = {
+        Enabled = boolean,
+        Position = "Right" | "Left",
+        CheckTeam = boolean, CheckFriends = boolean, -- Validates via Roblox API
+        Text = string, Color = Color3,
+    },
+}
+```
+
+---
+
+##  Directories (Custom Entity Tracking)
+To track non-player objects (NPCs, Vehicles, Items), append tables to the `Directories` array inside the config. The library will automatically scan and apply ESP to matches.
+
+### Directory Entry Schema:
+```lua
+Directories = {
+    {
+        DisplayName = "Target Name",    -- Text displayed on the ESP
+        Path = "workspace.Map.Zombies", -- Exact hierarchy path to parent container
+        Multiple = boolean,             -- If true, searches children. If false, targets the Path itself.
+        Recursive = boolean,            -- If true, uses GetDescendants() instead of GetChildren()
+        Names = { "Zombie", "Mutant" }, -- Array of valid instance names to track
+        BlockNames = { "Dead" },        -- Ignore instances containing these strings
+        Contains = { "Humanoid" },      -- Instance must have these child names to be tracked
+        NonHuman = boolean,             -- Set to true if object lacks a Humanoid (Vehicles/Items)
+        NoStatus = boolean,             -- Disables Flags (Moving, Jumping, etc.) for this object
+        Cheap = boolean,                -- If true, disables boxes/bars and only renders Name & Distance
+        Config = {                      -- Overrides GLOBAL config for this specific entity type
+            BoxColor = Color3.fromRGB(255, 0, 0),
+            Chams = { Enabled = false }
+        }
+    }
+}
+```
+
+---
+
+##  AI Usage Example (Boilerplate)
+*Instruction for AI: Use this template when asked to generate a SensoryESP script.*
+
+```lua
+local ESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/rthusrtghdfhtyjkehrfh/sensoryESP/refs/heads/main/ESP.lua"))()
+
+ESP:Load({
+    Enabled = true,
+    Players = true,
+    LocalPlayer = false,
+    
+    Boxes = true,
+    BoxType = "Normal",
+    BoxColor = Color3.fromRGB(255, 255, 255),
+    
+    Names = true,
+    TextOutline = true,
+    Font = "Proggy Clean",
+    
+    HealthBar = {
+        Enabled = true,
+        Position = "Left",
+        ShowText = true,
+        Gradient = { Enabled = true, Color1 = Color3.fromRGB(0,255,0), Color3 = Color3.fromRGB(255,0,0) }
+    },
+
+    Directories = {
+        -- Example: Tracking custom NPCs
+        {
+            DisplayName = "Enemy",
+            Path = "workspace",
+            Multiple = true,
+            Names = { "Dummy", "NPC" },
+            NonHuman = false,
+            Config = {
+                BoxColor = Color3.fromRGB(255, 50, 50),
+                Distance = { Enabled = true }
+            }
+        },
+        -- Example: Tracking items (Cheap ESP)
+        {
+            DisplayName = "Weapon Drop",
+            Path = "workspace.DroppedItems",
+            Multiple = true,
+            Names = { "AK47", "M4A1" },
+            NonHuman = true,
+            Cheap = true, -- Only renders text and distance
+            Config = { TextColor = Color3.fromRGB(255, 255, 0) }
+        }
+    }
+})
+
+-- To modify settings at runtime:
+-- ESP:GetConfig().Boxes = false
+```
