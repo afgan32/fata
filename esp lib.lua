@@ -217,7 +217,7 @@ local ESPConfig = {
     HealthBar = {
         Enabled = false,
         Position = "Left", -- "Left", "Right", "Top", "Bottom"
-        SideGap = 2,
+        SideGap = 1,
         Width = 2,
         OffsetX = 0,
         OffsetY = 0,
@@ -228,8 +228,8 @@ local ESPConfig = {
         TextFollowBar = false,
         HideWhenFullHP = false,
         FollowGradientColorText = false,
-        Font = "Smallest Pixel-7",
-        TextSize = 9,
+        Font = "Proggy Clean",
+        TextSize = 12,
         Outline = {
             Style = "Full",
             Color = Color3.fromRGB(0, 0, 0),
@@ -250,6 +250,15 @@ local ESPConfig = {
     TextOutlineStyle = "Full", -- "Full", "None"
     TextGap = 3,
     Font = "Proggy Clean",
+    Placement = {
+        Gap = 1,
+        SideGap = 4,
+        Name = { anchor = "top", stackIndex = 0, offsetX = 0, offsetY = 0 },
+        HealthText = { anchor = "left", stackIndex = 0, offsetX = 0, offsetY = 0 },
+        Weapon = { anchor = "bottom", stackIndex = 0, offsetX = 0, offsetY = 0 },
+        Distance = { anchor = "bottom", stackIndex = 1, offsetX = 0, offsetY = 0 },
+        Flags = { anchor = "right", stackIndex = 0, offsetX = 0, offsetY = 0 },
+    },
     TeamIndicator = {
         Enabled = false,
         Position = "Right", -- "Left" or "Right"
@@ -285,8 +294,8 @@ local ESPConfig = {
         SideGap = 4,
         TextGap = 2,
         OutlineStyle = "Full",
-        Font = "Smallest Pixel-7",
-        TextSize = 9,
+        Font = "Proggy Clean",
+        TextSize = 12,
         Options = {
             Moving = false,
             Vehicle = false,
@@ -1575,6 +1584,53 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
         end
     end
 
+    local function getPlacementField(key, field, fallback)
+        local v = GetCfg("Placement." .. key .. "." .. field)
+        if v == nil then
+            v = GetCfg("Placement." .. key .. "." .. field:sub(1,1):upper() .. field:sub(2))
+        end
+        if v == nil then return fallback end
+        return v
+    end
+
+    local function placementPosition(key, textW, textH, defaultAnchor, defaultStack)
+        local anchor = getPlacementField(key, "anchor", defaultAnchor)
+        local stack = tonumber(getPlacementField(key, "stackIndex", defaultStack or 0)) or 0
+        local ox = tonumber(getPlacementField(key, "offsetX", 0)) or 0
+        local oy = tonumber(getPlacementField(key, "offsetY", 0)) or 0
+        local gap = tonumber(GetCfg("Placement.Gap")) or 1
+        local sideGap = tonumber(GetCfg("Placement.SideGap")) or 4
+        local pxPos, pyPos
+
+        if key == "HealthText" and (anchor == "left" or anchor == "right") then
+            local hpWidth = GetCfg("HealthBar.Width") or 2
+            local hpSideGap = GetCfg("HealthBar.SideGap") or 1
+            if anchor == "left" then
+                pxPos = x - hpSideGap - hpWidth - 5 - textW
+            else
+                pxPos = x + sx + hpSideGap + hpWidth + 5
+            end
+            pyPos = y + 1
+        elseif anchor == "top" then
+            pxPos = px - textW / 2
+            pyPos = y - textH - gap - topOffset - stack * (textH + gap)
+        elseif anchor == "bottom" then
+            pxPos = px - textW / 2
+            pyPos = y + sy + gap + bottomOffset + stack * (textH + gap)
+        elseif anchor == "left" then
+            pxPos = x - textW - sideGap - leftOffset
+            pyPos = y + stack * (textH + gap)
+        elseif anchor == "right" then
+            pxPos = x + sx + sideGap + rightOffset
+            pyPos = y + stack * (textH + gap)
+        else
+            pxPos = px - textW / 2
+            pyPos = y + sy + gap + bottomOffset + stack * (textH + gap)
+        end
+
+        return math.floor(pxPos + ox), math.floor(pyPos + oy), anchor
+    end
+
     if isCheap then
         for i = 1, 4 do
             espObj.Lines[i].Visible = false
@@ -1705,7 +1761,7 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
         fill.Visible = false
     end
 
-    local nameY = y - textSize - (GetCfg("TextGap") or 0) - topOffset
+    local nameX, nameY = placementPosition("Name", 100, textSize, "top", 0)
     local teamOwner = instance:IsA("Model") and Players:GetPlayerFromCharacter(instance) or nil
     local leftTags = {}
     local rightTags = {}
@@ -1758,7 +1814,7 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
 
     if GetCfg("Names") then
         espObj.Text.Text = finalNameText
-        espObj.Text.Position = UDim2.new(0, px - 50, 0, nameY)
+        espObj.Text.Position = UDim2.new(0, nameX, 0, nameY)
         espObj.Text.Visible = true
     else
         espObj.Text.Visible = false
@@ -1768,7 +1824,8 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
     local currentBottomY = y + sy + distGap + bottomOffset
     if GetCfg("Distance.Enabled") then
         espObj.DistanceText.Visible = true
-        espObj.DistanceText.Position = UDim2.new(0, px - 50, 0, currentBottomY)
+        local distX, distY = placementPosition("Distance", 100, GetCfg("Distance.TextSize") or textSize, "bottom", 1)
+        espObj.DistanceText.Position = UDim2.new(0, distX, 0, distY)
 
         local distUnit = GetCfg("Distance.Unit")
         local distVal = distanceStuds
@@ -1808,7 +1865,8 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
         if weaponName and weaponName ~= "" and weaponName ~= "nil" then
             espObj.WeaponText.Visible = true
             espObj.WeaponText.Text = weaponName
-            espObj.WeaponText.Position = UDim2.new(0, px - 50, 0, currentBottomY)
+            local wepX, wepY = placementPosition("Weapon", 100, GetCfg("Weapon.TextSize") or textSize, "bottom", 0)
+            espObj.WeaponText.Position = UDim2.new(0, wepX, 0, wepY)
         else
             espObj.WeaponText.Visible = false
         end
@@ -1941,6 +1999,10 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
                 local textY = hpTextFollowBar and barTopY or (y + hpOffsetY)
                 espObj.HealthText.Position = UDim2.new(0, textX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, textY + (GetCfg("HealthBar.TextOffsetY") or 0))
             end
+
+            local hpPlaceX, hpPlaceY, hpPlaceAnchor = placementPosition("HealthText", 50, GetCfg("HealthBar.TextSize") or textSize, "left", 0)
+            espObj.HealthText.Position = UDim2.new(0, hpPlaceX + (GetCfg("HealthBar.TextOffsetX") or 0), 0, hpPlaceY + (GetCfg("HealthBar.TextOffsetY") or 0))
+            espObj.HealthText.TextXAlignment = hpPlaceAnchor == "left" and Enum.TextXAlignment.Right or Enum.TextXAlignment.Left
         else
             espObj.HealthText.Visible = false
         end
@@ -2016,10 +2078,8 @@ local UpdateESPObj = LPHNoVirtualize(function(espObj, position, size, name, dist
                 table.insert(flags, { text = "Idle", color = flagColorsIdle })
             end
 
-            local isRight = flagPosition == "Right"
-            local fx = isRight and (x + sx + flagSideGap + rightOffset) or
-                (x - 100 - flagSideGap - leftOffset)
-            local fy = y - flagGap
+            local fx, fy, flagAnchor = placementPosition("Flags", 100, flagTextSize, string.lower(flagPosition or "right"), 0)
+            local isRight = flagAnchor ~= "left"
 
             if flagFont == "Smallest Pixel-7" then
                 fy = fy - 3
